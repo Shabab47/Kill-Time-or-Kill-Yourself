@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kill Time or Kill Yourself</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="game-container">
+<canvas id="gc"></canvas>
+
+<div id="hud">
+<div id="hud-top">
+<div id="hud-left">
+<div class="bar-container"><div class="bar-fill" id="hp-fill" style="width:100%"></div></div>
+</div>
+<div id="hud-right">
+<div id="hud-text">
+<div>Level <span id="hud-level">1</span></div>
+<div>Wave <span id="hud-wave">1</span></div>
+<div>Kills: <span id="hud-kills">0</span></div>
+</div>
+</div>
+</div>
+<div id="hud-bottom">
+<div class="bar-container" id="xp-bar-container"><div class="bar-fill" id="xp-fill" style="width:0%"></div></div>
+</div>
+</div>
+
+<div id="wave-announce">WAVE <span id="wave-num">1</span><span>The hordes descend...</span></div>
+
+<div id="start-screen">
+<h1>DIE OR KILL TIME</h1>
+<p class="subtitle">Survive the endless darkness as long as you can but know that you'll surely die.</p>
+<p class="controls-info">WASD / Arrows — Move &nbsp;|&nbsp; Space — Dash<br>Auto-targets the nearest foe. Touch controls on mobile.</p>
+<button class="btn" id="start-btn">ENTER THE DARKNESS</button>
+</div>
+
+<div id="diff-panel">
+<h2>CHOOSE YOUR FATE</h2>
+<div id="diff-choices">
+<button class="diff-btn" data-diff="dusk"><span class="diff-name">Dusk</span><span class="diff-desc">The darkness stirs slowly…</span></button>
+<button class="diff-btn" data-diff="midnight"><span class="diff-name">Midnight</span><span class="diff-desc">The balance of shadow.</span></button>
+<button class="diff-btn" data-diff="void"><span class="diff-name">Void</span><span class="diff-desc">The abyss hungers…</span></button>
+<button class="diff-btn" data-diff="oblivion"><span class="diff-name">Oblivion</span><span class="diff-desc">The end of all things.</span></button>
+</div>
+</div>
+
+<div id="upgrade-panel">
+<h2>SOUL ASCENDED</h2>
+<div class="upgrade-choices" id="upgrade-choices"></div>
+</div>
+
+<div id="pause-panel">
+<h2>PAUSED</h2>
+<div id="pause-actions">
+<button class="btn pause-action" id="resume-btn">RESUME</button>
+<button class="btn pause-action" id="sound-btn">SOUND: ON</button>
+<button class="btn pause-action" id="pause-restart-btn">RESTART</button>
+<button class="btn pause-action" id="menu-btn">GO TO MENU</button>
+</div>
+</div>
+
+<div id="game-over">
+<h2>CONSUMED BY DARKNESS</h2>
+<div id="final-stats">
+<div>Survived <span id="final-waves">0</span> waves</div>
+<div>Destroyed <span id="final-kills">0</span> foes</div>
+<div>Reached Level <span id="final-level">0</span></div>
+</div>
+<button class="btn" id="restart-btn">RISE AGAIN</button>
+</div>
+</div>
+
+<script>
+const canvas = document.getElementById('gc');
+const ctx = canvas.getContext('2d');
+function resize() {
+  canvas.width = window.innerWidth * devicePixelRatio;
+  canvas.height = window.innerHeight * devicePixelRatio;
+  canvas.style.width = window.innerWidth + 'px';
+  canvas.style.height = window.innerHeight + 'px';
+}
+resize();
+window.addEventListener('resize', resize);
+const W = () => canvas.width;
+const H = () => canvas.height;
+const DW = () => window.innerWidth;
+const DH = () => window.innerHeight;
+const DPR = () => devicePixelRatio || 1;
+</script>
+
+<script src="../src/config.js"></script>
+<script src="../src/utils.js"></script>
+<script src="../src/sprites/registry.js"></script>
+<script src="../src/map/sprites.js"></script>
+<script src="../src/map/torch.js"></script>
+<script src="../src/map/MapGenerator.js"></script>
+<script src="../src/audio/registry.js"></script>
+<script src="../src/audio/demon/skeleton.js"></script>
+<script src="../src/audio/demon/cultist.js"></script>
+<script src="../src/audio/demon/hound.js"></script>
+<script src="../src/audio/demon/knight.js"></script>
+<script src="../src/audio/demon/lich.js"></script>
+<script src="../src/audio/AudioManager.js"></script>
+<script src="../src/Input.js"></script>
+<script src="../src/Camera.js"></script>
+<script src="../src/Particles.js"></script>
+<script src="../src/items/Item.js"></script>
+<script src="../src/items/sprites.js"></script>
+<script src="../src/projectiles/sprites/player.js"></script>
+<script src="../src/projectiles/sprites/enemy.js"></script>
+<script src="../src/projectiles/sprites/playerGlow.js"></script>
+<script src="../src/enemies/Enemy.js"></script>
+<script src="../src/enemies/Chaser.js"></script>
+<script src="../src/enemies/Cultist.js"></script>
+<script src="../src/enemies/Lich.js"></script>
+<script src="../src/enemies/XpOrb.js"></script>
+<script src="../src/enemies/registry.js"></script>
+<script src="../src/enemies/sprites/skeleton.js"></script>
+<script src="../src/enemies/sprites/cultist.js"></script>
+<script src="../src/enemies/sprites/hound.js"></script>
+<script src="../src/enemies/sprites/knight.js"></script>
+<script src="../src/enemies/sprites/lich.js"></script>
+<script src="../src/player/Player.js"></script>
+<script src="../src/player/sprite.js"></script>
+<script src="../src/systems/WaveManager.js"></script>
+<script src="../src/Renderer.js"></script>
+<script src="../src/Game.js"></script>
+</body>
+</html>

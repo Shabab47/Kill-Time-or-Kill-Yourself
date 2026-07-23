@@ -1,0 +1,60 @@
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;font-family:'Cinzel','Georgia',serif;user-select:none;-webkit-user-select:none;touch-action:none}
+#game-container{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#050505}
+canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
+#hud{position:absolute;inset:0;padding:12px 16px;pointer-events:none}
+#hud-top{display:flex;justify-content:space-between;align-items:flex-start}
+#hud-left{display:flex;flex-direction:column;gap:4px}
+#hud-right{text-align:right}
+#hud-bottom{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);width:400px;max-width:80vw}
+#xp-bar-container{width:100%;height:12px}
+.bar-container{width:200px;height:10px;background:rgba(40,40,40,0.2);border-radius:5px;overflow:hidden;border:1px solid rgba(201,168,76,0.2)}
+.bar-fill{height:100%;border-radius:5px;transition:width 0.15s}
+#hp-fill{background:linear-gradient(90deg,#4a0000,#c62828)}
+#xp-fill{background:linear-gradient(90deg,#4a0000,#ff4444)}
+#hud-text{color:#7e7e7e;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,0.8);line-height:1.8;font-weight:400;letter-spacing:1px}
+#hud-text span{color:#c9a84c;font-weight:700}
+#wave-announce{position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:900;color:#c62828;text-shadow:0 0 40px rgba(198,40,40,0.2),0 2px 10px rgba(0,0,0,0.8);pointer-events:none;opacity:0;transition:opacity 0.4s;letter-spacing:3px;text-align:center}
+#wave-announce.show{opacity:1}
+#wave-announce span{font-size:16px;font-weight:400;color:#9e9e9e;display:block;margin-top:8px;letter-spacing:2px}
+#start-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#050505;z-index:10;gap:20px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#game-over{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,5,0.92);z-index:10;gap:20px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#start-screen h1{font-size:clamp(36px,8vw,72px);font-weight:900;color:#c62828;text-shadow:0 0 60px rgba(198,40,40,0.3),0 0 120px rgba(198,40,40,0.1);letter-spacing:4px;text-align:center}
+#start-screen .subtitle{color:#7e7e7e;font-size:clamp(14px,2.5vw,18px);text-align:center;max-width:450px;letter-spacing:1px;line-height:1.6}
+#start-screen .controls-info{color:#4a4a4a;font-size:12px;text-align:center;margin-top:10px;letter-spacing:0.5px}
+#diff-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,5,0.92);z-index:10;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#diff-panel h2{font-size:36px;color:#c62828;text-shadow:0 0 20px rgba(198,40,40,0.3);letter-spacing:3px}
+#pause-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,5,0.85);z-index:10;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#pause-panel h2{font-size:48px;color:#c9a84c;text-shadow:0 0 30px rgba(201,168,76,0.2);letter-spacing:4px}
+#pause-actions{display:flex;flex-direction:column;gap:12px;align-items:center}
+.pause-action{min-width:220px}
+#diff-choices{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;max-width:520px}
+.diff-btn{background:rgba(40,40,40,0.12);border:1px solid rgba(100,100,100,0.2);border-radius:4px;padding:16px 20px;cursor:pointer;transition:all 0.25s;text-align:center;min-width:120px;flex:1;font-family:'Cinzel','Georgia',serif}
+.diff-btn:hover{background:rgba(40,40,40,0.3);border-color:rgba(201,168,76,0.3);transform:translateY(-2px)}
+.diff-btn .diff-name{display:block;color:#c9a84c;font-size:15px;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+.diff-btn .diff-desc{display:block;color:#666;font-size:11px;letter-spacing:0.5px}
+.btn{background:linear-gradient(135deg,#2a2a2a,#1a1a1a);color:#c62828;border:1px solid rgba(198,40,40,0.3);padding:14px 48px;font-size:20px;font-weight:700;border-radius:4px;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 20px rgba(0,0,0,0.5);font-family:'Cinzel','Georgia',serif;letter-spacing:2px}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 30px rgba(198,40,40,0.3);border-color:rgba(198,40,40,0.6)}
+.btn:active{transform:scale(0.97)}
+#game-over{display:none}
+#game-over h2{font-size:48px;color:#c62828;text-shadow:0 0 30px rgba(198,40,40,0.3);letter-spacing:3px}
+#final-stats{color:#7e7e7e;font-size:18px;text-align:center;line-height:2.2;letter-spacing:1px}
+#final-stats span{color:#c9a84c;font-weight:700}
+#upgrade-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,5,0.92);z-index:10;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#upgrade-panel h2{font-size:36px;color:#c62828;text-shadow:0 0 20px rgba(198,40,40,0.3);letter-spacing:3px}
+.upgrade-choices{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.upgrade-card{background:rgba(40,40,40,0.08);border:1px solid rgba(201,168,76,0.15);border-radius:4px;padding:20px;width:200px;cursor:pointer;transition:all 0.25s;text-align:center}
+.upgrade-card:hover{background:rgba(40,40,40,0.2);border-color:rgba(201,168,76,0.5);transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,0.5)}
+.upgrade-card .icon{font-size:36px;margin-bottom:8px}
+.upgrade-card .name{color:#c9a84c;font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:1px}
+.upgrade-card .desc{color:#7e7e7e;font-size:12px;line-height:1.5}
+.upgrade-card .level-badge{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:2px;background:rgba(40,40,40,0.25);color:#c62828;font-size:11px;font-weight:700;letter-spacing:1px}
+@media(max-width:600px){
+.bar-container{width:140px;height:8px}
+#hud-text{font-size:11px}
+#wave-announce{font-size:32px}
+#wave-announce span{font-size:14px}
+.upgrade-card{width:150px;padding:14px}
+.upgrade-card .icon{font-size:28px}
+.upgrade-card .name{font-size:13px}
+}
