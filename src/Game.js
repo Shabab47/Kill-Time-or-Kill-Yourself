@@ -160,12 +160,17 @@ class Game {
   syncOrbitals() {
     const p = this.player;
     if (!p || p.orbitalCount <= 0) { this.orbitals = []; return; }
+    const prev = this.orbitals.length;
     while (this.orbitals.length < p.orbitalCount) {
-      const angle = this.orbitals.length * (TAU / p.orbitalCount);
-      this.orbitals.push({ angle, hitTimers: new Map() });
+      this.orbitals.push({ angle: 0, hitTimers: new Map() });
     }
     while (this.orbitals.length > p.orbitalCount) {
       this.orbitals.pop();
+    }
+    if (prev !== p.orbitalCount) {
+      for (let i = 0; i < this.orbitals.length; i++) {
+        this.orbitals[i].angle = (i / p.orbitalCount) * TAU;
+      }
     }
   }
 

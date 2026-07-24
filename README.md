@@ -49,34 +49,69 @@ A gothic roguelike action game. Survive endless waves of darkness, collect souls
 ```
 Kill Time or Kill Yourself/
 ├── README.md
-├── frontend/                  # Presentation layer
-│   ├── index.html             # Game entry point
+├── frontend/                      # Presentation layer
+│   ├── index.html                 # Game entry point
 │   ├── css/
-│   │   └── style.css          # Gothic-themed styles
-│   └── js/
-│       ├── sprites.js          # Pre-rendered sprite canvases
-│       ├── renderer.js         # Canvas 2D rendering
-│       ├── input.js            # Keyboard + touch input
-│       ├── camera.js           # Camera follow + screen shake
-│       └── particles.js        # Particle effects system
-├── backend/                   # Game logic layer
-│   ├── config.js              # Constants, enemy stats, upgrades
-│   ├── utils.js               # Math helpers
+│   │   └── style.css              # Gothic-themed styles
+│   └── assets/                    # Bitmap assets
+│       ├── Elements/
+│       │   ├── FireBall/          # Fireball animation frames
+│       │   └── Ground/
+│       │       └── mudgrass.png   # Ground tile texture
+│       ├── enemies/               # Enemy sprite sheets
+│       └── player/                # Player sprite sheets
+├── src/                           # Game logic
+│   ├── config.js                  # Constants, enemy stats, upgrades
+│   ├── utils.js                   # Math helpers
+│   ├── Game.js                    # Game orchestrator + loop
+│   ├── Renderer.js                # Master renderer
+│   ├── Camera.js                  # Camera follow + screen shake
+│   ├── Input.js                   # Keyboard + touch input
+│   ├── Particles.js               # Particle effects system
+│   ├── sprites/
+│   │   └── registry.js            # Global sprite() function + cache
 │   ├── player/
-│   │   └── player.js          # Player class
-│   ├── enemy/
-│   │   ├── enemy.js           # Base Enemy class
-│   │   ├── skeleton.js        # Skeleton (melee)
-│   │   ├── cultist.js         # Cultist (ranged)
-│   │   ├── hound.js           # Hound (fast)
-│   │   ├── knight.js          # Knight (tank)
-│   │   ├── lich.js            # Lich (boss)
-│   │   ├── xp-orb.js          # XP orb class
-│   │   └── registry.js        # Enemy type -> class map
-│   ├── waves.js               # Wave spawner
-│   └── game.js                # Game orchestrator + loop
-└── audio/                     # Audio layer
-    └── audio.js               # Procedural audio (Web Audio API)
+│   │   ├── Player.js              # Player class
+│   │   └── sprite.js              # Procedural player sprites
+│   ├── enemies/
+│   │   ├── Enemy.js               # Base enemy class
+│   │   ├── Chaser.js              # Skeleton / Hound / Knight
+│   │   ├── Cultist.js             # Ranged cultist
+│   │   ├── Lich.js                # Boss enemy
+│   │   ├── XpOrb.js               # XP orb class
+│   │   ├── registry.js            # Enemy type → class map
+│   │   └── sprites/               # Enemy procedural + PNG sprite loaders
+│   ├── map/
+│   │   ├── MapGenerator.js        # Procedural obstacle generation
+│   │   ├── sprites.js             # Ground tile + misc sprite definitions
+│   │   └── torch.js               # Torch sprite
+│   ├── items/
+│   │   ├── Item.js                # Dropped item class
+│   │   └── sprites.js             # Item sprite definitions
+│   ├── projectiles/
+│   │   └── sprites/               # Projectile sprite canvases
+│   ├── effects/
+│   │   └── FireBall.js            # Orbital fireball animation loader
+│   ├── systems/
+│   │   └── WaveManager.js         # Wave spawning logic
+│   ├── audio/
+│   │   ├── registry.js            # Audio effect registry
+│   │   ├── AudioManager.js        # Web Audio API manager
+│   │   └── demon/                 # Procedural audio per enemy type
+│   └── render/                    # Render passes (one file per layer)
+│       ├── renderClear.js
+│       ├── renderTiles.js
+│       ├── renderOverlay.js
+│       ├── obstacles.js
+│       ├── xpOrbs.js
+│       ├── items.js
+│       ├── enemies.js
+│       ├── projectiles.js
+│       ├── player.js
+│       ├── orbitals.js
+│       ├── floatingNumbers.js
+│       ├── particles.js
+│       └── touchUI.js
 ```
 
 ## How to Run
