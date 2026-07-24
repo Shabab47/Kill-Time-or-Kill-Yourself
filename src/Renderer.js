@@ -167,14 +167,29 @@ class Renderer {
       const ss = e.size * 2.8;
       ctx.save();
 
-      if (e.hitFlash > 0) {
+      if (e.type === 'skeleton' && ENEMY_SPRITES.skeleton) {
+        const spriteEntry = getEnemySprite('skeleton', e.animState || 'idle', e.facing || 'S', e.animFrame || 0);
+        if (spriteEntry) {
+          const sizeMult = e.animState === 'dead' ? 0.65 : 1;
+          const targetH = e.size * 4.6 * sizeMult;
+          const scale = targetH / spriteEntry.h;
+          const drawW = spriteEntry.w * scale;
+          const drawH = targetH;
+          const drawX = e.x - drawW / 2;
+          const drawY = e.y + e.size * 0.9 - drawH;
+          ctx.drawImage(spriteEntry.img, drawX, drawY, drawW, drawH);
+        } else {
+          ctx.drawImage(sprites[e.type], e.x - ss / 2, e.y - ss / 2, ss, ss);
+        }
+      } else {
         ctx.drawImage(sprites[e.type], e.x - ss / 2, e.y - ss / 2, ss, ss);
+      }
+
+      if (e.hitFlash > 0) {
         ctx.fillStyle = `rgba(255,200,200,${e.hitFlash * 5})`;
         ctx.beginPath();
         ctx.arc(e.x, e.y, ss / 2, 0, TAU);
         ctx.fill();
-      } else {
-        ctx.drawImage(sprites[e.type], e.x - ss / 2, e.y - ss / 2, ss, ss);
       }
 
       if (e.type === 'lich') {
@@ -286,8 +301,12 @@ class Renderer {
       const pulse = 0.9 + Math.sin(game.gameTime * 8 + orb.angle) * 0.1;
       const gs = 28 * pulse;
       ctx.drawImage(sprites.orbitalGlow, fx - gs / 2, fy - gs / 2, gs, gs);
-      const fs = 14 * pulse;
-      ctx.drawImage(sprites.orbitalFireball, fx - fs / 2, fy - fs / 2, fs, fs);
+      const fb = getFireBallFrame(game.gameTime);
+      if (fb) {
+        const targetH = 28 * pulse;
+        const scale = targetH / fb.h;
+        ctx.drawImage(fb.img, fx - fb.w * scale / 2, fy - targetH / 2, fb.w * scale, targetH);
+      }
     }
 
     for (const e of game.enemies) {

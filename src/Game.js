@@ -263,7 +263,7 @@ class Game {
       if (!e.alive) continue;
       e.update(dt, this.player, this.enemies, this.projectiles, this.particles, this.cam, audio);
       this.pushApartFromObstacles(e);
-      if (this.player.alive && dist(this.player, e) < this.player.size + e.size) {
+      if (this.player.alive && dist(this.player, e) < this.player.size + e.size && !e.dying) {
         this.damagePlayer(e.damage, e);
       }
     }

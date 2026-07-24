@@ -18,19 +18,6 @@ sprite('grassTile', 60, 60, (ctx, w, h) => {
   }
 });
 
-sprite('orbitalFireball', 20, 20, (ctx, w, h) => {
-  const cx = w / 2, cy = h / 2;
-  const grad = ctx.createRadialGradient(cx - 2, cy - 2, 0, cx, cy, w / 2);
-  grad.addColorStop(0, '#fffbe6');
-  grad.addColorStop(0.3, '#ff8a50');
-  grad.addColorStop(0.6, '#ff4400');
-  grad.addColorStop(1, '#aa1100');
-  ctx.fillStyle = grad;
-  ctx.beginPath();
-  ctx.arc(cx, cy, w / 2 - 1, 0, TAU);
-  ctx.fill();
-});
-
 sprite('orbitalGlow', 40, 40, (ctx, w, h) => {
   const cx = w / 2, cy = h / 2;
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, w / 2);

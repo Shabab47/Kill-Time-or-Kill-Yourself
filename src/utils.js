@@ -26,3 +26,11 @@ class FloatingNumber {
     if (this.life <= 0) this.alive = false;
   }
 }
+
+const DIRS_8 = ['E', 'SE', 'S', 'SW', 'W', 'NW', 'N', 'NE'];
+function angleToDir8(angleRad) {
+  let deg = (angleRad * 180 / Math.PI) % 360;
+  if (deg < 0) deg += 360;
+  const idx = Math.round(deg / 45) % 8;
+  return DIRS_8[idx];
+}
