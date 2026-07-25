@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: #87ceeb;
+  }
+  #container {
+    position: relative;
+    width: 1200px;
+    height: 500px;
+    background: #3a7bd5;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .entity {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    color: white;
+    font: bold 14px sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+  }
+  #player {
+    left: 120px;
+    top: 210px;
+    background: #4fc3f7;
+    border: 3px solid #fff;
+  }
+  #enemy {
+    right: 120px;
+    top: 210px;
+    background: #ef5350;
+    border: 3px solid #fff;
+  }
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+</style>
+</head>
+<body>
+<div id="container">
+  <div class="entity" id="player">PLAYER</div>
+  <div class="entity" id="enemy">ENEMY</div>
+  <canvas id="c" width="1200" height="500"></canvas>
+</div>
+<script>
+const files = ['saf1.png', 'saf2.png', 'saf3.png', 'saf4.png', 'saf5.png'];
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const playerX = 150, playerY = 250;
+const enemyX = 1050, enemyY = 250;
+
+Promise.all(files.map(f => {
+  const img = new Image();
+  img.src = f;
+  return new Promise(r => { img.onload = () => r(img); img.onerror = r; });
+})).then(frames => {
+  if (!frames[0]) {
+    document.body.innerHTML = '<p style="color:red;font-size:24px">Failed to load images</p>';
+    return;
+  }
+  const fw = frames[0].width, fh = frames[0].height;
+  const duration = 1500;
+  let startTime = null;
+
+  function draw(time) {
+    if (!startTime) startTime = time;
+    const t = Math.min((time - startTime) / duration, 1);
+    const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+
+    const x = playerX + (enemyX - playerX) * ease;
+    const y = playerY + (enemyY - playerY) * ease;
+    const angle = Math.atan2(enemyY - playerY, enemyX - playerX);
+    const fi = Math.floor(t * files.length) % files.length;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.drawImage(frames[fi], -fw / 2, -fh / 2);
+    ctx.restore();
+
+    if (t < 1) requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+});
+</script>
+</body>
+</html>

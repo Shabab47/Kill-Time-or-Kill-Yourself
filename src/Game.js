@@ -42,6 +42,8 @@ class Game {
     this.level = 1;
     this.upgradeStacks = {};
     this.gameTime = 0;
+    this._lastTime = undefined;
+    this._accumulator = 0;
     this.bossAlive = false;
     this.state = 'playing';
     document.getElementById('start-screen').style.display = 'none';
@@ -53,7 +55,7 @@ class Game {
     this.updateHUD();
   }
 
-  getUpgradeChoices(count = 3) {
+  getUpgradeChoices(count = 4) {
     const available = UPGRADES.filter(u => {
       const stack = this.upgradeStacks[u.id] || 0;
       return stack < u.maxStack;
@@ -74,7 +76,7 @@ class Game {
 
   showUpgradeScreen() {
     this.state = 'upgrade';
-    const choices = this.getUpgradeChoices(3);
+    const choices = this.getUpgradeChoices(4);
     const container = document.getElementById('upgrade-choices');
     container.innerHTML = '';
     for (const u of choices) {
@@ -205,6 +207,47 @@ class Game {
     }
   }
 
+  fireSoulArrows(dt) {
+    const p = this.player;
+    if (!p || !p.alive || p.soulArrowCount <= 0) return;
+    p.soulArrowFireTimer -= dt;
+    if (p.soulArrowFireTimer > 0) return;
+    p.soulArrowFireTimer = p.soulArrowInterval / p.attackSpeedMult;
+
+    let nearest = null;
+    let nearDist = p.soulArrowRange;
+    for (const e of this.enemies) {
+      if (!e.alive) continue;
+      const d = dist(p, e);
+      if (d < nearDist) { nearDist = d; nearest = e; }
+    }
+    if (!nearest) return;
+
+    const baseAngle = angle(p, nearest);
+    const spread = 0.12;
+    const count = p.soulArrowCount;
+    const startOff = (count - 1) * spread / 2;
+
+    for (let i = 0; i < count; i++) {
+      const a = baseAngle + i * spread - startOff + rand(-0.03, 0.03);
+      this.projectiles.push({
+        x: p.x + Math.cos(a) * 20, y: p.y + Math.sin(a) * 20,
+        vx: Math.cos(a) * 200, vy: Math.sin(a) * 200, _angle: a,
+        damage: p.soulArrowDamage,
+        pierceLeft: 1,
+        size: 8,
+        life: 4,
+        alive: true, hit: new Set(),
+        explosive: false,
+        owner: 'player',
+        isSoulArrow: true,
+        _spawned: 0,
+        _soulOffset: rand(0, 100)
+      });
+    }
+    this._lastSoulArrowPos = { x: p.x, y: p.y };
+  }
+
   updateHUD() {
     const p = this.player;
     if (!p) return;
@@ -274,17 +317,19 @@ class Game {
     }
 
     this.updateOrbitals(dt);
+    this.fireSoulArrows(dt);
 
     for (const p of this.projectiles) {
       if (!p.alive) continue;
       p.x += p.vx * dt;
       p.y += p.vy * dt;
       p.life -= dt;
+      if (p._spawned !== undefined) p._spawned++;
       if (p.life <= 0 || p.x < -50 || p.x > G.worldSize + 50 || p.y < -50 || p.y > G.worldSize + 50) {
         p.alive = false;
         continue;
       }
-      for (const ob of this.obstacles) {
+      if (!p._spawned || p._spawned >= 3) for (const ob of this.obstacles) {
         if (ob.intersects(p.x, p.y, p.size)) {
           p.alive = false;
           break;
@@ -327,6 +372,12 @@ class Game {
       }
     }
     this.projectiles = this.projectiles.filter(p => p.alive);
+
+    if (this._lastSoulArrowPos) {
+      audio.play('slash');
+      this.particles.emit(this._lastSoulArrowPos.x, this._lastSoulArrowPos.y, 6, { speed: 120, life: 0.3, color: '#4fc3f7', size: 4, glow: true });
+      this._lastSoulArrowPos = null;
+    }
 
     for (const e of this.enemies) {
       if (!e.alive && e.hp <= 0) {
@@ -386,13 +437,17 @@ class Game {
   }
 
   loop(t) {
-    const dt = Math.min(1 / 30, 1 / 60);
+    if (this._lastTime === undefined) this._lastTime = t;
+    this._lastTime = t;
+
     input.update();
     if (this.state === 'playing' && input.escapePressed) {
       input.escapePressed = false;
       this.togglePause();
     }
-    this.update(dt);
+
+    this.update(1/60);
+
     this.renderer.render(this);
     input.endFrame();
     requestAnimationFrame(t2 => this.loop(t2));

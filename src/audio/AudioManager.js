@@ -16,7 +16,10 @@ class AudioManager {
   }
   init() {
     if (!this.ctx) {
-      try { this.ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) {}
+      try {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.ctx.resume();
+      } catch (e) {}
     }
   }
   toggle() {

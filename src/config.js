@@ -1,11 +1,12 @@
+const RENDER_SCALE = 1.5;
 const G = {
   worldSize: 3000,
   playerBase: {
     hp: 100,
     speed: 220,
-    damage: 12,
-    attackSpeed: 0.4,
-    attackRange: 320,
+    damage: 10,
+    attackSpeed: 0.55,
+    attackRange: 150,
     projectileSpeed: 500
   },
   enemyBase: {
@@ -62,4 +63,5 @@ const UPGRADES = [
   { id: 'dashdmg', name: 'Phantom Rush', desc: 'Dash deals 40 damage', icon: '👻', apply: p => { p.dashDamage += 40; }, maxStack: 2 },
   { id: 'aoe', name: 'Hellfire', desc: '+30% explosion radius', icon: '🔥', apply: p => { p.aoeRadiusMult *= 1.3; }, maxStack: 3 },
   { id: 'orbital', name: 'Infernal Orbit', desc: 'Fireball circles you, burning enemies', icon: '🔥', apply: p => { p.orbitalCount += 1; p.orbitalDamage = p.orbitalDamage ? p.orbitalDamage * 1.5 : 10; }, maxStack: 3 },
+  { id: 'soulArrow', name: 'Soul Arrow', desc: 'Auto-fire soul arrows at nearest foe', icon: '🔮', apply: p => { p.soulArrowCount += 1; p.soulArrowDamage = (p.soulArrowDamage || 10) * 1.25; }, maxStack: 5 },
 ];

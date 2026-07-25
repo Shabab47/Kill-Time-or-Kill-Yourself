@@ -1,6 +1,6 @@
 function renderProjectiles(ctx, game) {
   for (const p of game.projectiles) {
-    if (!p.alive) continue;
+    if (!p.alive || p.isSoulArrow) continue;
     const projSprite = p.owner === 'player' ? sprites.playerProj : sprites.enemyProj;
     const ss = p.size * 3;
     if (p.owner === 'player') {

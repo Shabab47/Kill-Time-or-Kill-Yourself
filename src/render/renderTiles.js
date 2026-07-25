@@ -1,6 +1,6 @@
 function renderTiles(ctx, game, dw, dh) {
   const tileSize = 60;
-  const GRID = 4;
+  const GRID = 6;
   const imgReady = mudGrassImg.complete && mudGrassImg.naturalWidth > 0;
   const sw = mudGrassImg.naturalWidth / GRID;
   const sh = mudGrassImg.naturalHeight / GRID;

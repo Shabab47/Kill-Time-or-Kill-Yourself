@@ -25,8 +25,13 @@ class Player {
     this.dashDamage = 0;
     this.orbitalCount = 0;
     this.orbitalDamage = 0;
-    this.orbitalRadius = 55;
+    this.orbitalRadius = 80;
     this.orbitalSpeed = 3;
+    this.soulArrowCount = 1;
+    this.soulArrowDamage = 10;
+    this.soulArrowRange = 800;
+    this.soulArrowFireTimer = 0;
+    this.soulArrowInterval = 1.5;
     this.invincibleTimer = 0;
     this.attackTimer = 0;
     this.dashCooldown = 0;
@@ -102,7 +107,7 @@ class Player {
     this.attackTimer -= dt;
 
     let nearest = null;
-    let nearDist = this.attackRange + 50;
+    let nearDist = this.attackRange;
     for (const e of enemies) {
       if (!e.alive) continue;
       const d = dist(this, e);

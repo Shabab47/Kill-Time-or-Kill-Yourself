@@ -12,4 +12,5 @@ function renderParticles(ctx, game) {
     ctx.fill();
     ctx.shadowBlur = 0;
   }
+  ctx.globalAlpha = 1;
 }

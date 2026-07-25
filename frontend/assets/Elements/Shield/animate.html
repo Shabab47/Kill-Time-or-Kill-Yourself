@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: #87ceeb;
+  }
+  #container {
+    position: relative;
+    width: 800px;
+    height: 900px;
+    background: #3a7bd5;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  #ground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: #4a7c3f;
+    border-top: 4px solid #2d5a27;
+  }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="ground"></div>
+  <canvas id="c" width="800" height="900"></canvas>
+</div>
+<script>
+const img = new Image();
+img.src = 'Shield.png';
+img.onload = () => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const sw = img.width / 3;
+  const sh = img.height / 3;
+  const startY = -sh;
+  const landY = 900 - 40 - sh;
+  const duration = 1200;
+  let startTime = null;
+
+  function draw(time) {
+    if (!startTime) startTime = time;
+    const t = Math.min((time - startTime) / duration, 1);
+
+    const bounce = t < 0.75
+      ? startY + (landY - startY) * (t / 0.75)
+      : landY - Math.sin((t - 0.75) / 0.25 * Math.PI) * 30 * (1 - (t - 0.75) / 0.25);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, img.width, img.height,
+      (800 - sw) / 2, bounce, sw, sh);
+
+    if (t < 1) requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+};
+img.onerror = () => { document.body.innerHTML = '<p style="color:red;font-size:24px">Failed to load Shield.png</p>'; };
+</script>
+</body>
+</html>

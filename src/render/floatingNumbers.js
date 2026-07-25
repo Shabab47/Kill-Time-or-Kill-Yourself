@@ -1,14 +1,15 @@
 function renderFloatingNumbers(ctx, game) {
+  ctx.font = 'bold 18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
   for (const fn of game.floatingNumbers) {
-    const alpha = fn.life / fn.maxLife;
-    ctx.globalAlpha = alpha;
+    ctx.globalAlpha = fn.life / fn.maxLife;
     ctx.fillStyle = fn.color;
-    ctx.font = `bold ${fn.size}px Cinzel, Georgia, serif`;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur = 6;
+    ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+    ctx.lineWidth = 3;
+    ctx.strokeText(fn.text, fn.x, fn.y);
     ctx.fillText(fn.text, fn.x, fn.y);
-    ctx.shadowBlur = 0;
   }
+  ctx.globalAlpha = 1;
+  ctx.lineWidth = 1;
 }
