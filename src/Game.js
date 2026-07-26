@@ -16,6 +16,7 @@ class Game {
     this.level = 1;
     this.upgradeStacks = {};
     this.orbitals = [];
+    this.lightningStrikes = [];
     this.state = 'menu';
     this.gameTime = 0;
     this.bossAlive = false;
@@ -36,6 +37,7 @@ class Game {
     this.floatingNumbers = [];
     this.particles = new ParticleSystem();
     this.orbitals = [];
+    this.lightningStrikes = [];
     this.waveManager = new WaveManager(this.difficulty);
     this.kills = 0;
     this.xp = 0;
@@ -192,7 +194,7 @@ class Game {
       orb.angle += p.orbitalSpeed * dt;
       if (orb.angle > TAU) orb.angle -= TAU;
       const fx = p.x + Math.cos(orb.angle) * p.orbitalRadius;
-      const fy = p.y + Math.sin(orb.angle) * p.orbitalRadius;
+      const fy = (p.y - p.size * 1.4) + Math.sin(orb.angle) * p.orbitalRadius;
       for (const e of this.enemies) {
         if (!e.alive) continue;
         const remaining = orb.hitTimers.get(e) || 0;
@@ -256,6 +258,29 @@ class Game {
     this._lastSoulArrowPos = { x: p.x, y: p.y };
   }
 
+  fireLightningStrikes(dt) {
+    const p = this.player;
+    if (!p || !p.alive || p.lightningStrikeCount <= 0) return;
+    p.lightningStrikeFireTimer -= dt;
+    if (p.lightningStrikeFireTimer > 0) return;
+    p.lightningStrikeFireTimer = p.lightningStrikeInterval;
+
+    const alive = this.enemies.filter(e => e.alive);
+    if (alive.length === 0) return;
+
+    const count = Math.min(p.lightningStrikeCount, alive.length);
+    const shuffled = [...alive].sort(() => Math.random() - 0.5);
+    for (let i = 0; i < count; i++) {
+      const target = shuffled[i];
+      target.takeDamage(p.lightningStrikeDamage, p, this.particles, this.cam, audio);
+      this.floatingNumbers.push(new FloatingNumber(target.x, target.y - target.size - 8, Math.round(p.lightningStrikeDamage).toString(), '#88ccff'));
+      this.lightningStrikes.push({ x: target.x, y: target.y, startY: this.cam.sy - 50, timer: 0.45, maxTimer: 0.45 });
+      this.particles.emit(target.x, target.y, 8, { speed: 120, life: 0.4, color: '#88ccff', size: 5, glow: true });
+      audio.play('lightning');
+      this.cam.shake(6);
+    }
+  }
+
   updateHUD() {
     const p = this.player;
     if (!p) return;
@@ -290,6 +315,7 @@ class Game {
     this.floatingNumbers = [];
     this.particles = new ParticleSystem();
     this.orbitals = [];
+    this.lightningStrikes = [];
     this.waveManager = new WaveManager(this.difficulty);
     this.kills = 0;
     this.xp = 0;
@@ -326,6 +352,12 @@ class Game {
 
     this.updateOrbitals(dt);
     this.fireSoulArrows(dt);
+    this.fireLightningStrikes(dt);
+
+    for (const s of this.lightningStrikes) {
+      s.timer -= dt;
+    }
+    this.lightningStrikes = this.lightningStrikes.filter(s => s.timer > 0);
 
     for (const p of this.projectiles) {
       if (!p.alive) continue;

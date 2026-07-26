@@ -64,4 +64,5 @@ const UPGRADES = [
   { id: 'aoe', name: 'Hellfire', desc: '+30% explosion radius', icon: '🔥', apply: p => { p.aoeRadiusMult *= 1.3; }, maxStack: 3 },
   { id: 'orbital', name: 'Infernal Orbit', desc: 'Fireball circles you, burning enemies', icon: '🔥', apply: p => { p.orbitalCount += 1; p.orbitalDamage = p.orbitalDamage ? p.orbitalDamage * 1.5 : 10; }, maxStack: 3 },
   { id: 'soulArrow', name: 'Soul Arrow', desc: 'Auto-fire soul arrows at nearest foe', icon: '🔮', apply: p => { p.soulArrowCount += 1; p.soulArrowDamage = (p.soulArrowDamage || 10) * 1.25; }, maxStack: 5 },
+  { id: 'lightning', name: 'Divine Wrath', desc: 'Lightning strikes a random enemy', icon: '⚡', apply: p => { p.lightningStrikeCount += 1; p.lightningStrikeDamage = (p.lightningStrikeDamage || 25) * 1.3; }, maxStack: 3 },
 ];

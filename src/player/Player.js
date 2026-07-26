@@ -32,6 +32,10 @@ class Player {
     this.soulArrowRange = 800;
     this.soulArrowFireTimer = 0;
     this.soulArrowInterval = 1.5;
+    this.lightningStrikeCount = 0;
+    this.lightningStrikeDamage = 25;
+    this.lightningStrikeFireTimer = 0;
+    this.lightningStrikeInterval = 2;
     this.invincibleTimer = 0;
     this.shieldActive = false;
     this.attackTimer = 0;

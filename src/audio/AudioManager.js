@@ -7,6 +7,7 @@ const builtInSounds = {
   levelup: { type: 'sine', freq: [523, 622, 784], dur: 0.35, gain: 0.08 },
   dash: { type: 'sawtooth', freq: [200, 500], dur: 0.15, gain: 0.06 },
   explosion: { type: 'sawtooth', freq: [60, 15], dur: 0.3, gain: 0.1 },
+  lightning: { type: 'sawtooth', freq: [3000, 80], dur: 0.25, gain: 0.12 },
 };
 
 class AudioManager {

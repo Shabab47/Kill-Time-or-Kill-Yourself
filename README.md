@@ -4,7 +4,7 @@ A gothic roguelike action game. Survive endless waves of darkness, collect souls
 
 ## How to Play
 
-**Survive.** Each wave brings more and deadlier foes. Slay them, collect their souls (XP), and level up to choose from 15 dark pacts. Every 5 waves, a Lich awakens.
+**Survive.** Each wave brings more and deadlier foes. Slay them, collect their souls (XP), and level up to choose from 16 dark pacts. Every 5 waves, a Lich awakens.
 
 **Controls**
 
@@ -56,6 +56,8 @@ Drop rates scale slightly with wave number.
 | Phantom Rush 👻 | Dash deals 40 damage | 2 |
 | Hellfire 🔥 | +30% explosion radius | 3 |
 | Infernal Orbit 🔥 | Fireball circles you, burning enemies | 3 |
+| Soul Arrow 🔮 | Auto-fire soul arrows at nearest foe | 5 |
+| Divine Wrath ⚡ | Lightning strikes a random enemy from the sky | 3 |
 
 ## Project Structure
 
@@ -71,6 +73,10 @@ Kill Time or Kill Yourself/
 │       │   ├── FireBall/          # Fireball animation frames
 │       │   ├── Ground/
 │       │   │   └── mudgrass.png   # Ground tile texture
+│       │   ├── Lighting Strike/
+│       │   │   ├── LF1.png        # Lightning frame 1
+│       │   │   ├── LF2.png        # Lightning frame 2
+│       │   │   └── demo.html      # Standalone lightning animation preview
 │       │   └── Shield/
 │       │       ├── Shield.png     # Shield item sprite (PNG overlay)
 │       │       └── animate.html   # Standalone shield animation preview
@@ -108,6 +114,7 @@ Kill Time or Kill Yourself/
 │   │   └── sprites/               # Projectile sprite canvases
 │   ├── effects/
 │   │   ├── FireBall.js            # Orbital fireball animation loader
+│   │   ├── LightningStrike.js     # Lightning bolt frame loader
 │   │   └── SoulArrow.js           # Soul arrow projectile effect
 │   ├── systems/
 │   │   └── WaveManager.js         # Wave spawning logic
@@ -128,6 +135,7 @@ Kill Time or Kill Yourself/
 │       ├── orbitals.js
 │       ├── floatingNumbers.js
 │       ├── particles.js
+│       ├── lightningStrike.js     # Lightning bolt animation renderer
 │       └── touchUI.js
 ```
 

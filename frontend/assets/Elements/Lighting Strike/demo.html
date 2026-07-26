@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Lightning Strike Demo</title>
+<style>
+  body { margin: 0; background: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: monospace; color: #fff; }
+  canvas { border: 1px solid #333; }
+  button { margin-top: 16px; padding: 10px 24px; font-size: 16px; background: #ffff66; border: none; cursor: pointer; font-family: monospace; font-weight: bold; }
+  p { margin-top: 8px; color: #888; }
+</style>
+</head>
+<body>
+<canvas id="c" width="500" height="500"></canvas>
+<button id="strike">STRIKE ⚡</button>
+<p>Click to trigger a lightning strike at a random X position</p>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+const FRAMES = [];
+let loaded = 0;
+for (let i = 1; i <= 2; i++) {
+  const img = new Image();
+  img.onload = () => { loaded++; };
+  img.src = 'LF' + i + '.png';
+  FRAMES.push({ img });
+}
+
+const strikes = [];
+const TARGET_Y = 420;
+
+document.getElementById('strike').onclick = () => {
+  strikes.push({
+    x: 80 + Math.random() * 340,
+    y: TARGET_Y,
+    startY: -200,
+    timer: 0.45,
+    maxTimer: 0.45
+  });
+};
+
+function loop() {
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, 500, 500);
+
+  // draw ground line
+  ctx.strokeStyle = '#333';
+  ctx.beginPath();
+  ctx.moveTo(0, TARGET_Y);
+  ctx.lineTo(500, TARGET_Y);
+  ctx.stroke();
+
+  const now = performance.now() / 1000;
+  const frameIdx = Math.floor(now * 8) % 2;
+  const frame = FRAMES[frameIdx];
+
+  for (let i = strikes.length - 1; i >= 0; i--) {
+    const s = strikes[i];
+    s.timer -= 1 / 60;
+    if (s.timer <= 0) { strikes.splice(i, 1); continue; }
+
+    const progress = 1 - s.timer / s.maxTimer;
+    const sw = 60, sh = 120;
+    const x = Math.round(s.x);
+
+    ctx.save();
+    ctx.shadowColor = '#ffff66';
+    ctx.shadowBlur = 30;
+
+    if (progress < 0.6) {
+      const t = progress / 0.6;
+      const curY = s.startY + (s.y - s.startY) * t;
+      ctx.globalAlpha = t;
+      const stretch = 1 + (1 - t) * 2;
+      ctx.drawImage(frame.img, x - sw / 2, curY - sh * stretch, sw, sh * stretch);
+    } else {
+      const t = (progress - 0.6) / 0.4;
+      const flash = t < 0.3 ? 1 : 1 - (t - 0.3) / 0.7;
+      ctx.globalAlpha = flash;
+      ctx.shadowBlur = 30 + flash * 20;
+      ctx.drawImage(frame.img, x - sw / 2, s.y - sh, sw, sh);
+    }
+
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  requestAnimationFrame(loop);
+}
+loop();
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@ function renderOrbitals(ctx, game) {
     const p = game.player;
     if (!p || !p.alive) continue;
     const fx = p.x + Math.cos(orb.angle) * p.orbitalRadius;
-    const fy = p.y + Math.sin(orb.angle) * p.orbitalRadius;
+    const fy = (p.y - p.size * 1.4) + Math.sin(orb.angle) * p.orbitalRadius;
     const pulse = 0.9 + Math.sin(game.gameTime * 8 + orb.angle) * 0.1;
     const gs = 74 * pulse;
     ctx.drawImage(sprites.orbitalGlow, fx - gs / 2, fy - gs / 2, gs, gs);

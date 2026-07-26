@@ -23,6 +23,7 @@ class Renderer {
     renderFloatingNumbers(ctx, game);
     renderParticles(ctx, game);
     renderSoulArrows(ctx, game);
+    renderLightningStrikes(ctx, game);
 
     ctx.restore();
 
