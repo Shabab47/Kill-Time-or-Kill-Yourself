@@ -33,6 +33,7 @@ class Player {
     this.soulArrowFireTimer = 0;
     this.soulArrowInterval = 1.5;
     this.invincibleTimer = 0;
+    this.shieldActive = false;
     this.attackTimer = 0;
     this.dashCooldown = 0;
     this.dashDuration = 0;

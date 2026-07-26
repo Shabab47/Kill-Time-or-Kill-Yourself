@@ -12,6 +12,8 @@ class Item {
     this.spriteId = 'healthPotion';
     this.color = '#c62828';
     this.label = 'Health';
+    this.scaleX = 1;
+    this.scaleY = 1;
 
     switch (type) {
       case 'health':
@@ -25,7 +27,9 @@ class Item {
         this.spriteId = 'shieldPotion';
         this.color = '#7c4dff';
         this.label = 'Shield';
-        this.size = 11;
+        this.size = 13.75;
+        this.scaleX = 2;
+        this.scaleY = 2.25;
         break;
       case 'speed':
         this.glowColor = '#66bb6a';
@@ -68,7 +72,7 @@ class Item {
         game.particles.emit(this.x, this.y, 10, { speed: 80, life: 0.4, color: '#c62828', size: 4 });
         break;
       case 'shield':
-        player.invincibleTimer = 3;
+        player.shieldActive = true;
         game.particles.emit(this.x, this.y, 12, { speed: 100, life: 0.5, color: '#7c4dff', size: 5, glow: true });
         break;
       case 'speed':

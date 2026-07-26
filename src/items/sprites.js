@@ -54,6 +54,16 @@ sprite('shieldPotion', 20, 24, (ctx, w, h) => {
   ctx.stroke();
 });
 
+const shieldImg = new Image();
+shieldImg.onload = () => {
+  const c = document.createElement('canvas');
+  c.width = shieldImg.naturalWidth;
+  c.height = shieldImg.naturalHeight;
+  c.getContext('2d').drawImage(shieldImg, 0, 0);
+  sprites['shieldPotion'] = c;
+};
+shieldImg.src = 'assets/Elements/Shield/Shield.png';
+
 sprite('speedBoost', 22, 22, (ctx, w, h) => {
   const x = w / 2, y = h / 2;
   ctx.fillStyle = '#0a1a00';

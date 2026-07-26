@@ -131,7 +131,15 @@ class Game {
   }
 
   damagePlayer(dmg, enemy) {
-    if (!this.player.alive || this.player.invincibleTimer > 0) return;
+    if (!this.player.alive) return;
+    if (this.player.shieldActive) {
+      this.player.shieldActive = false;
+      this.player.invincibleTimer = 0.15;
+      this.particles.emit(this.player.x, this.player.y, 20, { speed: 150, life: 0.6, color: '#7c4dff', size: 5, glow: true });
+      audio.play('explosion');
+      return;
+    }
+    if (this.player.invincibleTimer > 0) return;
     const finalDmg = dmg * this.player.armorMult;
     this.player.hp -= finalDmg;
     this.player.invincibleTimer = 0.15;

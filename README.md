@@ -14,6 +14,19 @@ A gothic roguelike action game. Survive endless waves of darkness, collect souls
 | Space — Dash | Bottom-right button — Dash |
 | Auto-attacks nearest enemy | Auto-attacks nearest enemy |
 
+## Items
+
+Enemies have a chance to drop consumable items on death. Items despawn after 15 seconds.
+
+| Item | Effect |
+|---|---|
+| **Health Potion** | Restores 30 HP |
+| **Shield** | Grants a blue energy barrier that absorbs the next hit. Breaks on impact with particles and sound. |
+| **Haste** | +50% move speed for 5 seconds |
+| **Chest** | Grants a random upgrade |
+
+Drop rates scale slightly with wave number.
+
 ## Bestiary
 
 | Foe | Description |
@@ -56,8 +69,11 @@ Kill Time or Kill Yourself/
 │   └── assets/                    # Bitmap assets
 │       ├── Elements/
 │       │   ├── FireBall/          # Fireball animation frames
-│       │   └── Ground/
-│       │       └── mudgrass.png   # Ground tile texture
+│       │   ├── Ground/
+│       │   │   └── mudgrass.png   # Ground tile texture
+│       │   └── Shield/
+│       │       ├── Shield.png     # Shield item sprite (PNG overlay)
+│       │       └── animate.html   # Standalone shield animation preview
 │       ├── enemies/               # Enemy sprite sheets
 │       └── player/                # Player sprite sheets
 ├── src/                           # Game logic
@@ -86,12 +102,13 @@ Kill Time or Kill Yourself/
 │   │   ├── sprites.js             # Ground tile + misc sprite definitions
 │   │   └── torch.js               # Torch sprite
 │   ├── items/
-│   │   ├── Item.js                # Dropped item class
-│   │   └── sprites.js             # Item sprite definitions
+│   │   ├── Item.js                # Dropped item class + drop roll
+│   │   └── sprites.js             # Item sprite definitions (procedural + PNG)
 │   ├── projectiles/
 │   │   └── sprites/               # Projectile sprite canvases
 │   ├── effects/
-│   │   └── FireBall.js            # Orbital fireball animation loader
+│   │   ├── FireBall.js            # Orbital fireball animation loader
+│   │   └── SoulArrow.js           # Soul arrow projectile effect
 │   ├── systems/
 │   │   └── WaveManager.js         # Wave spawning logic
 │   ├── audio/
@@ -104,10 +121,10 @@ Kill Time or Kill Yourself/
 │       ├── renderOverlay.js
 │       ├── obstacles.js
 │       ├── xpOrbs.js
-│       ├── items.js
+│       ├── items.js               # Item rendering (supports per-axis scaling)
 │       ├── enemies.js
 │       ├── projectiles.js
-│       ├── player.js
+│       ├── player.js              # Player rendering + shield ball visual
 │       ├── orbitals.js
 │       ├── floatingNumbers.js
 │       ├── particles.js
