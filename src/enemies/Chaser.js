@@ -28,7 +28,6 @@ class Skeleton extends ChaserEnemy {
 
   takeDamage(dmg, source, particles, cam, audio) {
     if (this.dying) return;
-    dmg *= (1 - (source.armorMult !== undefined ? (1 - source.armorMult) : 0));
     this.hp -= dmg;
     this.hitFlash = 0.08;
     if (this.hp <= 0) {

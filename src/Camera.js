@@ -9,8 +9,14 @@ class Camera {
   follow(target, dt) {
     this.x = target.x - DW() / RENDER_SCALE / 2;
     this.y = target.y - DH() / RENDER_SCALE / 2;
-    this.shakeX = 0; this.shakeY = 0; this.shakeMag = 0;
+    if (this.shakeMag > 0.1) {
+      this.shakeMag -= dt * this.shakeDecay;
+      this.shakeX = rand(-this.shakeMag, this.shakeMag);
+      this.shakeY = rand(-this.shakeMag, this.shakeMag);
+    } else {
+      this.shakeMag = 0; this.shakeX = 0; this.shakeY = 0;
+    }
   }
-  get sx() { return this.x; }
-  get sy() { return this.y; }
+  get sx() { return this.x + this.shakeX; }
+  get sy() { return this.y + this.shakeY; }
 }

@@ -77,7 +77,8 @@ class Item {
         break;
       case 'speed':
         player.speedMult *= 1.5;
-        setTimeout(() => { if (player) player.speedMult /= 1.5; }, 5000);
+        player.speedBoostStacks += 1;
+        player.speedBoostTimer = 5;
         game.particles.emit(this.x, this.y, 12, { speed: 100, life: 0.5, color: '#66bb6a', size: 4, glow: true });
         break;
       case 'chest':

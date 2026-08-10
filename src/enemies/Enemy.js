@@ -18,7 +18,6 @@ class Enemy {
   }
 
   takeDamage(dmg, source, particles, cam, audio) {
-    dmg *= (1 - (source.armorMult !== undefined ? (1 - source.armorMult) : 0));
     this.hp -= dmg;
     this.hitFlash = 0.08;
     if (this.hp <= 0) {

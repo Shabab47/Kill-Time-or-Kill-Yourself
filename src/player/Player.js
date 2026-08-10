@@ -36,6 +36,8 @@ class Player {
     this.lightningStrikeDamage = 25;
     this.lightningStrikeFireTimer = 0;
     this.lightningStrikeInterval = 2;
+    this.speedBoostTimer = 0;
+    this.speedBoostStacks = 0;
     this.invincibleTimer = 0;
     this.shieldActive = false;
     this.attackTimer = 0;
@@ -68,6 +70,14 @@ class Player {
     this.invincibleTimer -= dt;
     this.dashCooldown -= dt;
     this.attackAnimTimer -= dt;
+    if (this.speedBoostStacks > 0) {
+      this.speedBoostTimer -= dt;
+      if (this.speedBoostTimer <= 0) {
+        this.speedBoostStacks -= 1;
+        this.speedMult /= 1.5;
+        this.speedBoostTimer = 5;
+      }
+    }
 
     let mx = input.moveX;
     let my = input.moveY;

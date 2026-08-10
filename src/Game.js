@@ -478,7 +478,10 @@ class Game {
 
   loop(t) {
     if (this._lastTime === undefined) this._lastTime = t;
+    let dt = (t - this._lastTime) / 1000;
     this._lastTime = t;
+    if (dt <= 0) dt = 1 / 60;
+    if (dt > 0.1) dt = 0.1;
 
     input.update();
     if (this.state === 'playing' && input.escapePressed) {
@@ -486,7 +489,7 @@ class Game {
       this.togglePause();
     }
 
-    this.update(1/60);
+    this.update(dt);
 
     this.renderer.render(this);
     input.endFrame();
