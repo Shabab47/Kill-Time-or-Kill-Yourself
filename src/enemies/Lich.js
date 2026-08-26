@@ -57,9 +57,6 @@ class Lich extends Enemy {
         break;
     }
 
-    this.x = clamp(this.x, 10, G.worldSize - 10);
-    this.y = clamp(this.y, 10, G.worldSize - 10);
-
     particles.emit(this.x + rand(-10, 10), this.y + rand(-10, 10), 1, {
       speed: 15, life: 1.0, color: this.phase === 3 ? '#e040fb' : this.phase === 2 ? '#7c4dff' : '#4a148c',
       size: 6, glow: true, shrink: false
@@ -86,7 +83,7 @@ class Lich extends Enemy {
         const a = angle(this, player) + rand(-0.5, 0.5);
         const sx = this.x + Math.cos(a) * rand(80, 120);
         const sy = this.y + Math.sin(a) * rand(80, 120);
-        enemies.push(new ENEMY_CLASSES[choose(types)](clamp(sx, 20, G.worldSize - 20), clamp(sy, 20, G.worldSize - 20), 1));
+        enemies.push(new ENEMY_CLASSES[choose(types)](sx, sy, 1));
       }
       particles.emit(this.x, this.y, 8, { speed: 100, life: 0.4, color: '#7c4dff', size: 5 });
       audio.play('dash');
@@ -132,7 +129,7 @@ class Lich extends Enemy {
   teleportNear(player) {
     const a = rand(0, TAU);
     const d = rand(100, 200);
-    this.x = clamp(player.x + Math.cos(a) * d, 30, G.worldSize - 30);
-    this.y = clamp(player.y + Math.sin(a) * d, 30, G.worldSize - 30);
+    this.x = player.x + Math.cos(a) * d;
+    this.y = player.y + Math.sin(a) * d;
   }
 }

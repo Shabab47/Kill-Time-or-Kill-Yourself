@@ -82,13 +82,7 @@ class Item {
         game.particles.emit(this.x, this.y, 12, { speed: 100, life: 0.5, color: '#66bb6a', size: 4, glow: true });
         break;
       case 'chest':
-        const choices = game.getUpgradeChoices(3);
-        if (choices.length > 0) {
-          const picked = choose(choices);
-          game.applyUpgrade(picked);
-        } else {
-          player.hp = Math.min(player.maxHp, player.hp + 20);
-        }
+        game.openChest(this.x, this.y);
         break;
     }
     if (this.type !== 'chest') {
@@ -103,11 +97,11 @@ function rollItemDrop(x, y, game) {
   const waveBonus = game.waveManager.wave * 0.02;
   if (r < 0.06 + waveBonus) {
     return new Item(x, y, 'chest');
-  } else if (r < 0.18 + waveBonus) {
+  } else if (r < 0.16 + waveBonus) {           // healing trimmed: mistakes matter
     return new Item(x, y, 'health');
-  } else if (r < 0.26 + waveBonus * 0.5) {
+  } else if (r < 0.22 + waveBonus * 0.5) {
     return new Item(x, y, 'shield');
-  } else if (r < 0.33 + waveBonus * 0.3) {
+  } else if (r < 0.28 + waveBonus * 0.3) {
     return new Item(x, y, 'speed');
   }
   return null;

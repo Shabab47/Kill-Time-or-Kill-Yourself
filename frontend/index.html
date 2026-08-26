@@ -12,9 +12,11 @@
 <canvas id="gc"></canvas>
 
 <div id="hud">
+<div id="hud-timer">0:00</div>
 <div id="hud-top">
 <div id="hud-left">
 <div class="bar-container"><div class="bar-fill" id="hp-fill" style="width:100%"></div></div>
+<div id="hud-inventory"></div>
 </div>
 <div id="hud-right">
 <div id="hud-text">
@@ -30,6 +32,7 @@
 </div>
 
 <div id="wave-announce">WAVE <span id="wave-num">1</span><span>The hordes descend...</span></div>
+<div id="swarm-banner"></div>
 
 <div id="start-screen">
 <h1>KILL TIME OR KILL YOURSELF</h1>
@@ -46,6 +49,11 @@
 <button class="diff-btn" data-diff="void"><span class="diff-name">Void</span><span class="diff-desc">The abyss hungers…</span></button>
 <button class="diff-btn" data-diff="oblivion"><span class="diff-name">Oblivion</span><span class="diff-desc">The end of all things.</span></button>
 </div>
+</div>
+
+<div id="char-panel">
+<h2>CHOOSE YOUR SOUL</h2>
+<div id="char-choices"></div>
 </div>
 
 <div id="upgrade-panel">

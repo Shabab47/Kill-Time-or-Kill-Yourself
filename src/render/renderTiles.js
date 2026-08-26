@@ -21,13 +21,4 @@ function renderTiles(ctx, game, dw, dh) {
       }
     }
   }
-
-  const border = 30;
-  if (game.cam.sx < border || game.cam.sy < border || game.cam.sx + dw > G.worldSize - border || game.cam.sy + dh > G.worldSize - border) {
-    ctx.fillStyle = 'rgba(30,30,30,0.08)';
-    ctx.fillRect(0, 0, G.worldSize, border);
-    ctx.fillRect(0, G.worldSize - border, G.worldSize, border);
-    ctx.fillRect(0, 0, border, G.worldSize);
-    ctx.fillRect(G.worldSize - border, 0, border, G.worldSize);
-  }
 }

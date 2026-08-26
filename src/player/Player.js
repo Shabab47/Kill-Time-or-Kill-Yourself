@@ -1,7 +1,8 @@
 class Player {
-  constructor() {
-    this.x = G.worldSize / 2;
-    this.y = G.worldSize / 2;
+  constructor(character) {
+    // Endless world: everyone spawns at the origin.
+    this.x = 0;
+    this.y = 0;
     this.size = 14;
     this.hp = G.playerBase.hp;
     this.maxHp = G.playerBase.hp;
@@ -41,6 +42,16 @@ class Player {
     this.invincibleTimer = 0;
     this.shieldActive = false;
     this.attackTimer = 0;
+
+    // --- Vampire-Survivors-style build state ---
+    this.weapons = {};        // weaponId -> level
+    this.passives = {};       // passiveId -> level
+    this.cooldownMult = 1;    // lowered by the Alacrity passive
+    // Soul Scythe (base weapon) stats; re-derived by its apply() on level-up.
+    this.scytheSwings = 1;
+    this.scytheTargets = 1;
+    this.scytheDamageMult = 1;
+
     this.dashCooldown = 0;
     this.dashDuration = 0;
     this.dashDir = { x: 0, y: 0 };
@@ -57,6 +68,14 @@ class Player {
     this.dashFrameTimer = 0;
     this.dashFrame = 0;         // alternates 0/1 between the 'jump' and 'fall' sheets
     this.attackAnimTimer = 0;   // counts down while the slash pose should be shown
+
+    // Character selection: grants the starting weapon and its passive bonus.
+    if (character) {
+      this.characterId = character.id;
+      this.weapons[character.startWeapon] = 1;
+      findUpgrade(character.startWeapon).apply(this);
+      character.apply(this);
+    }
   }
 
   get speed() { return this.baseSpeed * this.speedMult; }
@@ -65,153 +84,174 @@ class Player {
   get attackRange() { return this.baseAttackRange; }
   get projectileSpeed() { return this.baseProjectileSpeed; }
 
-  update(dt, enemies, projectiles, particles, cam, audio, floatingNumbers) {
+  update(deltaTime, enemies, projectiles, particles, cam, audio, floatingNumbers) {
     if (!this.alive) return;
-    this.invincibleTimer -= dt;
-    this.dashCooldown -= dt;
-    this.attackAnimTimer -= dt;
+    this.applyTimers(deltaTime);
+
+    const moveInput = this.readMovementInput();
+    // No world bounds: the map is endless (Vampire Survivors-style).
+    const isMoving = this.applyMovement(moveInput, deltaTime, enemies, particles, cam, audio);
+    this.tryDash(moveInput, particles, audio);
+    this.attackNearestEnemy(deltaTime, enemies, particles, cam, audio, floatingNumbers);
+    this.updateAnimationState(deltaTime, isMoving);
+    this.applyRegeneration(deltaTime);
+
+    if (this.hp <= 0) {
+      this.alive = false;
+    }
+  }
+
+  applyTimers(deltaTime) {
+    this.invincibleTimer -= deltaTime;
+    this.dashCooldown -= deltaTime;
+    this.attackAnimTimer -= deltaTime;
+
+    // Haste stacks each expire independently: when one runs out, one stack's
+    // speed bonus is removed and the next stack's timer restarts.
     if (this.speedBoostStacks > 0) {
-      this.speedBoostTimer -= dt;
+      this.speedBoostTimer -= deltaTime;
       if (this.speedBoostTimer <= 0) {
         this.speedBoostStacks -= 1;
         this.speedMult /= 1.5;
         this.speedBoostTimer = 5;
       }
     }
+  }
 
-    let mx = input.moveX;
-    let my = input.moveY;
-    const len = Math.hypot(mx, my);
-    if (len > 1) { mx /= len; my /= len; }
+  // Returns the (normalized) movement vector from keyboard or touch input.
+  readMovementInput() {
+    let inputX = input.moveX;
+    let inputY = input.moveY;
+    const inputLength = Math.hypot(inputX, inputY);
+    if (inputLength > 1) {
+      inputX /= inputLength;
+      inputY /= inputLength;
+    }
+    return { x: inputX, y: inputY, length: Math.min(1, inputLength) };
+  }
 
-    let moving = false;
+  // Moves the player (dash overrides normal walking) and returns whether the
+  // player was visibly moving this frame.
+  applyMovement(moveInput, deltaTime, enemies, particles, cam, audio) {
+    let isMoving = false;
 
     if (this.dashDuration > 0) {
-      this.dashDuration -= dt;
-      this.x += this.dashDir.x * this.dashSpeed * dt;
-      this.y += this.dashDir.y * this.dashSpeed * dt;
-      moving = true;
-      for (const e of enemies) {
-        if (!e.alive) continue;
-        if (dist(this, e) < this.size + e.size) {
-          if (this.dashDamage > 0) {
-            e.takeDamage(this.dashDamage, this, particles, cam, audio);
-          }
+      this.dashDuration -= deltaTime;
+      this.x += this.dashDir.x * this.dashSpeed * deltaTime;
+      this.y += this.dashDir.y * this.dashSpeed * deltaTime;
+      this.damageEnemiesDashedThrough(enemies, particles, cam, audio);
+      isMoving = true;
+    } else if (moveInput.length > 0.1) {
+      this.x += moveInput.x * this.speed * deltaTime;
+      this.y += moveInput.y * this.speed * deltaTime;
+      this.moveAngle = Math.atan2(moveInput.y, moveInput.x);
+      isMoving = true;
+    }
+    return isMoving;
+  }
+
+  damageEnemiesDashedThrough(enemies, particles, cam, audio) {
+    if (this.dashDamage <= 0) return;
+    for (const enemy of enemies) {
+      if (!enemy.alive) continue;
+      if (dist(this, enemy) < this.size + enemy.size) {
+        enemy.takeDamage(this.dashDamage, this, particles, cam, audio);
+      }
+    }
+  }
+
+  tryDash(moveInput, particles, audio) {
+    const canDash = this.dashCooldown <= 0 && this.dashDuration <= 0 && moveInput.length > 0.1;
+    if (!input.getDash() || !canDash) return;
+
+    this.dashDuration = 0.18;
+    this.dashCooldown = this.baseDashCooldown;
+    this.dashDir = moveInput.length > 0.1 ? { x: moveInput.x, y: moveInput.y } : { x: 1, y: 0 };
+    this.invincibleTimer = 0.2;
+    audio.play('dash');
+    particles.emit(this.x, this.y, 10, { speed: 150, life: 0.3, color: '#7c4dff', size: 6 });
+  }
+
+  // Auto-attacks the closest enemy in range whenever the attack cooldown is
+  // ready. Scythe level widens the cleave (`scytheTargets`) and adds extra
+  // quick swings (`scytheSwings`); Might multiplies the damage dealt.
+  attackNearestEnemy(deltaTime, enemies, particles, cam, audio, floatingNumbers) {
+    this.attackTimer -= deltaTime;
+    const target = findNearestEnemy(this, enemies, this.attackRange);
+    if (!target || this.attackTimer > 0) return;
+
+    this.attackTimer = this.attackSpeed * this.cooldownMult;
+    const targetAngle = angle(this, target);
+    this.facing = angleToDir8(targetAngle);
+    this.attackAnimTimer = Math.min(0.25, this.attackSpeed * 0.8);
+    audio.play('slash');
+
+    const swingTargets = enemies
+      .filter((enemy) => enemy.alive && dist(this, enemy) <= this.attackRange)
+      .sort((enemyA, enemyB) => dist(this, enemyA) - dist(this, enemyB))
+      .slice(0, this.scytheTargets);
+
+    const slashDamage = this.damage * this.scytheDamageMult;
+    for (let swingIndex = 0; swingIndex < this.scytheSwings; swingIndex++) {
+      for (const enemy of swingTargets) {
+        if (!enemy.alive) continue;
+
+        enemy.takeDamage(slashDamage, this, particles, cam, audio);
+        if (floatingNumbers) {
+          floatingNumbers.push(new FloatingNumber(enemy.x, enemy.y - enemy.size - 8, Math.round(slashDamage).toString(), '#5ce1ff'));
+        }
+        applyLifesteal(this, slashDamage);
+
+        if (Math.random() < this.explosiveChance) {
+          detonateExplosion(enemy.x, enemy.y, slashDamage, this, enemy, enemies, particles, cam, audio);
         }
       }
-    } else if (len > 0.1) {
-      this.x += mx * this.speed * dt;
-      this.y += my * this.speed * dt;
-      this.moveAngle = Math.atan2(my, mx);
-      moving = true;
     }
 
-    this.x = clamp(this.x, 20, G.worldSize - 20);
-    this.y = clamp(this.y, 20, G.worldSize - 20);
+    this.emitSlashArcParticles(targetAngle, particles);
+  }
 
-    if (input.getDash() && this.dashCooldown <= 0 && this.dashDuration <= 0 && len > 0.1) {
-      this.dashDuration = 0.18;
-      this.dashCooldown = this.baseDashCooldown;
-      this.dashDir = { x: mx, y: my };
-      if (len <= 0.1) { this.dashDir = { x: 1, y: 0 }; }
-      this.invincibleTimer = 0.2;
-      audio.play('dash');
-      particles.emit(this.x, this.y, 10, { speed: 150, life: 0.3, color: '#7c4dff', size: 6 });
+  // Cyan slash-arc particles, swept across the facing direction.
+  emitSlashArcParticles(slashAngle, particles) {
+    const ARC_PARTICLE_COUNT = 12;
+    const arcRadius = this.attackRange * 0.35;
+    for (let particleIndex = 0; particleIndex < ARC_PARTICLE_COUNT; particleIndex++) {
+      const spreadAngle = slashAngle + (particleIndex / (ARC_PARTICLE_COUNT - 1) - 0.5) * 1.4;
+      const particleX = this.x + Math.cos(spreadAngle) * arcRadius;
+      const particleY = this.y + Math.sin(spreadAngle) * arcRadius;
+      particles.emit(particleX, particleY, 1, { speed: 40, life: 0.18, color: '#5ce1ff', size: 4, glow: true });
     }
+  }
 
-    this.attackTimer -= dt;
-
-    let nearest = null;
-    let nearDist = this.attackRange;
-    for (const e of enemies) {
-      if (!e.alive) continue;
-      const d = dist(this, e);
-      if (d < nearDist) { nearDist = d; nearest = e; }
-    }
-
-    if (nearest && this.attackTimer <= 0) {
-      this.attackTimer = this.attackSpeed;
-      const a = angle(this, nearest);
-      this.facing = angleToDir8(a);
-      this.attackAnimTimer = Math.min(0.25, this.attackSpeed * 0.8);
-      audio.play('slash');
-
-      // Melee slash: hit the nearest enemies within range. `pierce` widens
-      // how many foes a single swing can cleave through; `projectileCount`
-      // (renamed in spirit to "extra hits") lands additional quick swings.
-      const hitCap = 1 + this.pierce;
-      const candidates = enemies
-        .filter(e => e.alive && dist(this, e) <= this.attackRange)
-        .sort((e1, e2) => dist(this, e1) - dist(this, e2))
-        .slice(0, hitCap);
-
-      const swings = Math.max(1, this.projectileCount);
-      for (let s = 0; s < swings; s++) {
-        for (const e of candidates) {
-          if (!e.alive) continue;
-          e.takeDamage(this.damage, this, particles, cam, audio);
-          if (floatingNumbers) {
-            floatingNumbers.push(new FloatingNumber(e.x, e.y - e.size - 8, Math.round(this.damage).toString(), '#5ce1ff'));
-          }
-          if (this.lifesteal > 0) {
-            this.hp = Math.min(this.maxHp, this.hp + this.damage * this.lifesteal);
-          }
-          if (Math.random() < this.explosiveChance) {
-            const radius = 60 * this.aoeRadiusMult;
-            particles.emitExplosion(e.x, e.y, radius, { speed: 180, count: 15, color: '#c62828', life: 0.4, size: 5 });
-            audio.play('explosion');
-            cam.shake(6);
-            for (const e2 of enemies) {
-              if (!e2.alive || e2 === e) continue;
-              const d = dist(e, e2);
-              if (d < radius) {
-                const falloff = 1 - d / radius;
-                e2.takeDamage(this.damage * 0.5 * falloff, this, particles, cam, audio);
-              }
-            }
-          }
-        }
-      }
-
-      // Cyan slash-arc particles, swept across the facing direction.
-      for (let i = 0; i < 12; i++) {
-        const spread = a + (i / 11 - 0.5) * 1.4;
-        const dpx = this.x + Math.cos(spread) * (this.attackRange * 0.35);
-        const dpy = this.y + Math.sin(spread) * (this.attackRange * 0.35);
-        particles.emit(dpx, dpy, 1, { speed: 40, life: 0.18, color: '#5ce1ff', size: 4, glow: true });
-      }
-    }
-
-    // --- Animation state machine ---
+  updateAnimationState(deltaTime, isMoving) {
     if (this.dashDuration > 0) {
       this.animState = 'dash';
       this.facing = angleToDir8(Math.atan2(this.dashDir.y, this.dashDir.x));
-      this.dashFrameTimer -= dt;
+      this.dashFrameTimer -= deltaTime;
       if (this.dashFrameTimer <= 0) {
         this.dashFrameTimer = 0.09;
         this.dashFrame = 1 - this.dashFrame;
       }
     } else if (this.attackAnimTimer > 0) {
       this.animState = 'attack';
-    } else if (moving) {
+    } else if (isMoving) {
       this.animState = 'walk';
       this.facing = angleToDir8(this.moveAngle);
-      this.walkCycleTimer -= dt;
-      const cycleSpeed = clamp(0.32 - this.speed / 1400, 0.1, 0.3);
+      // Walk cycle speeds up with movement speed.
+      this.walkCycleTimer -= deltaTime;
+      const walkCycleSpeed = clamp(0.32 - this.speed / 1400, 0.1, 0.3);
       if (this.walkCycleTimer <= 0) {
-        this.walkCycleTimer = cycleSpeed;
+        this.walkCycleTimer = walkCycleSpeed;
         this.walkFrame = 1 - this.walkFrame;
       }
     } else {
       this.animState = 'idle';
     }
+  }
 
+  applyRegeneration(deltaTime) {
     if (this.hp < this.maxHp && this.regen > 0) {
-      this.hp = Math.min(this.maxHp, this.hp + this.regen * dt);
-    }
-
-    if (this.hp <= 0) {
-      this.alive = false;
+      this.hp = Math.min(this.maxHp, this.hp + this.regen * deltaTime);
     }
   }
 }

@@ -8,8 +8,6 @@ class ChaserEnemy extends Enemy {
       this.x += Math.cos(a) * this.speed * dt;
       this.y += Math.sin(a) * this.speed * dt;
     }
-    this.x = clamp(this.x, 10, G.worldSize - 10);
-    this.y = clamp(this.y, 10, G.worldSize - 10);
   }
 }
 

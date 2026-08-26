@@ -14,6 +14,7 @@ class Renderer {
 
     renderTiles(ctx, game, ww, wh);
     renderObstacles(ctx, game, ww, wh);
+    renderAura(ctx, game);
     renderXpOrbs(ctx, game);
     renderItems(ctx, game);
     renderEnemies(ctx, game);

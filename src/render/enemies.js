@@ -43,6 +43,15 @@ function renderEnemies(ctx, game, dw, dh) {
       ctx.fill();
     }
 
+    if (e.elite) {   // elites wear a pulsing golden crown-ring
+      const pulse = 6 + Math.sin(game.gameTime * 4) * 3;
+      ctx.strokeStyle = 'rgba(201,168,76,0.8)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(e.x, e.y, ss / 2 + pulse, 0, TAU);
+      ctx.stroke();
+    }
+
     if (e.hp < e.maxHp) {
       const barW = ss * 0.9;
       const barH = 3;
