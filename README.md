@@ -27,7 +27,7 @@ Portraits are generated pixel art (`tools/generate_character_art.py`).
 
 | Hero | Starting Weapon | Bonus |
 |---|---|---|
-| **The Knight** | 💀 Soul Scythe | +20 HP · takes 10% less damage |
+| **The Knight** | 🪓 Reaper's Axe | +20 HP · takes 10% less damage |
 | **The Necromancer** | 🔮 Soul Arrow | +15% damage · +30% pickup range |
 | **The Rogue** | 🗡️ Phantom Whip | +15% move speed · 8% faster weapons |
 

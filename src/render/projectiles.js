@@ -2,28 +2,18 @@ function renderProjectiles(ctx, game) {
   for (const p of game.projectiles) {
     if (!p.alive || p.isSoulArrow) continue;
 
-    if (p.isAxe) {   // spinning reaper's axe: blade + handle drawn rotated
-      ctx.save();
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p._spin || 0);
-      ctx.fillStyle = '#5d4037';                    // handle
-      ctx.fillRect(-1.5, -10, 3, 20);
-      ctx.fillStyle = '#b0bec5';                    // blade edge
-      ctx.beginPath();
-      ctx.moveTo(-2, -10);
-      ctx.lineTo(-12, -4);
-      ctx.lineTo(-2, 2);
-      ctx.closePath();
-      ctx.fill();
-      ctx.beginPath();                              // mirrored blade
-      ctx.moveTo(2, -10);
-      ctx.lineTo(12, -4);
-      ctx.lineTo(2, 2);
-      ctx.closePath();
-      ctx.fill();
-      ctx.fillStyle = '#78909c';                    // blade shading
-      ctx.fillRect(-12, -4.5, 24, 1.5);
-      ctx.restore();
+    if (p.isAxe) {   // spinning reaper's axe, rendered from the Throw axe sprite
+      const axe = sprites.throwAxe;
+      if (axe && axe.ready && axe.w > 0) {
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p._spin || 0);
+        ctx.shadowColor = 'rgba(79, 195, 247, 0.9)';   // light-blue glow for visibility
+        ctx.shadowBlur = 16;
+        const fit = 64.0 / axe.h;        // 2x sprite size, height clamped to 64 world px
+        ctx.drawImage(axe.img, -axe.w * fit / 2, -32, axe.w * fit, 64);
+        ctx.restore();
+      }
       continue;
     }
 

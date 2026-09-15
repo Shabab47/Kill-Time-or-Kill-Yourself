@@ -577,10 +577,8 @@ class Game {
       projectile.x += projectile.vx * deltaTime;
       projectile.y += projectile.vy * deltaTime;
       projectile.life -= deltaTime;
-      if (projectile.gravity) {              // axes arc under gravity and spin
-        projectile.vy += 900 * deltaTime;
-        projectile._spin += deltaTime * 12;
-      }
+      if (projectile.isAxe) projectile._spin += deltaTime * 12;   // turning axes keep spinning
+      if (projectile.gravity) projectile.vy += 900 * deltaTime;   // axes no longer arc; others still do
       if (projectile._spawned !== undefined) projectile._spawned++;
 
       // Endless world: projectiles only expire by lifetime now.
@@ -695,7 +693,8 @@ class Game {
     this.weaponTimers.whip = timer;
   }
 
-  // Reaper's Axe: hurled skyward with gravity, spinning, pierces everything.
+  // Reaper's Axe: hurls a spinning axe straight ahead that slices through
+  // everything — no arc, no drop; it flies on until its lifetime runs out.
   throwAxes(deltaTime) {
     const player = this.player;
     if (!player.alive || !player.weapons.axe) { this.weaponTimers.axe = 0; return; }
@@ -705,17 +704,18 @@ class Game {
       timer = player.axeInterval * player.cooldownMult;
       for (let axeIndex = 0; axeIndex < player.axeCount; axeIndex++) {
         const driftAngle = rand(0, TAU);
+        const driftSpeed = rand(320, 440);
         this.projectiles.push({
           x: player.x,
           y: player.y - 10,
-          vx: Math.cos(driftAngle) * rand(60, 160),
-          vy: -rand(380, 460),                 // launched upward; gravity pulls it down
-          gravity: true,
+          vx: Math.cos(driftAngle) * driftSpeed,   // constant velocity: no gravity
+          vy: Math.sin(driftAngle) * driftSpeed,
+          gravity: false,
           _spin: rand(0, TAU),
           damage: player.axeDamage * player.damageMult,
           pierceLeft: 999,                     // effectively infinite pierce
-          size: 11,
-          life: 2.4,
+          size: 22,
+          life: 3,
           alive: true,
           hit: new Set(),
           explosive: false,

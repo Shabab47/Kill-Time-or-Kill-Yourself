@@ -1,0 +1,1 @@
+spriteImage('throwAxe', 'assets/Elements/Throw axe.png');

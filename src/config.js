@@ -135,7 +135,7 @@ const CHARACTERS = [
     name: 'The Knight',
     portrait: 'assets/characters/knight/portrait.png',
     blurb: '+20 HP · takes 10% less damage',
-    startWeapon: 'scythe',
+    startWeapon: 'axe',
     apply: (p) => { p.maxHp += 20; p.hp += 20; p.armorMult *= 0.9; }
   },
   {
