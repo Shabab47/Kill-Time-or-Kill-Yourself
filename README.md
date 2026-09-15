@@ -4,9 +4,11 @@ A gothic, **Vampire Survivors–inspired** survival roguelite. Roam an **endless
 
 ## How to Play
 
-1. **ENTER THE DARKNESS** — pick a difficulty.
+1. **START** — pick a difficulty.
 2. **CHOOSE YOUR SOUL** — pick one of three heroes (each starts with a unique weapon and bonus).
 3. **Survive.** Your weapons fire automatically. Kill enemies → collect soul gems (XP) → level up → choose 1 of 4 upgrades.
+
+4. The menu also offers **HIGHSCORES** (top 10 runs saved in your browser), **OPTIONS** (toggle sound), and **EXIT** (browsers can't always self-close; the tab may need to be closed manually).
 
 There is no winning. The map never ends and neither does the horde. How long can you last?
 
@@ -61,16 +63,17 @@ When everything is maxed, level-ups offer a heal instead.
 
 ## The Endless World
 
-The map has **no borders**. Terrain scrolls forever and obstacles generate procedurally in 600px chunks, deterministically seeded — walk 10,000px away and back, and everything is exactly where you left it. Enemies that fall too far behind (>1400px) despawn silently so the horde always follows *you*.
+The map has **no borders**. Terrain scrolls forever and obstacles generate procedurally in 600px chunks, deterministically seeded — walk 10,000px away and back, and everything is exactly where you left it. Enemies materialize just outside the camera's visible edges (on-screen width/height + 80px), appearing from any of the four sides. Placement is *smoothed* — consecutive spawns walk along the edges with a low-discrepancy stride so arrivals spread evenly instead of clumping. Enemies that fall too far behind (>1400px) despawn silently so the horde always follows *you*.
 
 ## Difficulty Systems
 
 | System | Effect |
 |---|---|
-| **Waves** | Spawn counts grow every wave. Every 5th wave ends with a **Lich** boss. |
-| **Trickle stream** | A background stream spawns enemies continuously — even between waves. Never a safe moment. |
+| **Waves** | Timed waves — the next batch always spawns on schedule whether the old one is dead or not. Batch size and spawn rate tighten every minute survived. |
+| **Trickle stream** | A background stream spawns enemies continuously at the screen edge — even between waves. Never a safe moment. |
 | **Swarm events** | Every 60s a ring of foes closes in from all directions ("THE CIRCLE CLOSES IN…"). |
-| **Time ramp** | Every 45s survived adds +1 effective wave to enemy stats — running away forever makes them stronger, not weaker. |
+| **Enemy cap** | Most units spawn off-screen, so the horde can thicken — but at **300** concurrent enemies regular spawning pauses until the tide thins. |
+| **Time ramp** | Every 45s survived adds +1 effective wave to enemy stats; the bestiary pool expands each minute. Running away forever makes them stronger, not weaker. |
 | **Elites** | From wave 3, mid-wave spawns can be golden-ring elites: 7× HP, 1.5× size/damage, 6× XP — guaranteed treasure chest. |
 
 Per-difficulty growth per wave:

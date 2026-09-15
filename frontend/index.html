@@ -37,8 +37,35 @@
 <div id="start-screen">
 <h1>KILL TIME OR KILL YOURSELF</h1>
 <p class="subtitle">Survive the endless darkness as long as you can but know that you'll surely die.</p>
+<nav id="menu-column">
+<button class="btn menu-option" id="menu-start">START</button>
+<button class="btn menu-option" id="menu-highscores">HIGHSCORES</button>
+<button class="btn menu-option" id="menu-options">OPTIONS</button>
+<button class="btn menu-option exit" id="menu-exit">EXIT</button>
+</nav>
 <p class="controls-info">WASD / Arrows — Move &nbsp;|&nbsp; Space — Dash<br>Auto-targets the nearest foe. Touch controls on mobile.</p>
-<button class="btn" id="start-btn">ENTER THE DARKNESS</button>
+</div>
+
+<div id="options-panel">
+<h2>OPTIONS</h2>
+<div id="options-actions">
+<button class="btn pause-action" id="options-sound-btn">SOUND: ON</button>
+<button class="btn pause-action" id="options-back-btn">BACK</button>
+</div>
+<p id="exit-note"></p>
+</div>
+
+<div id="highscore-panel">
+<h2>HIGHSCORES</h2>
+<div id="highscore-tabs">
+<button class="hs-tab" data-diff="dusk">Dusk</button>
+<button class="hs-tab" data-diff="midnight">Midnight</button>
+<button class="hs-tab" data-diff="void">Void</button>
+<button class="hs-tab" data-diff="oblivion">Oblivion</button>
+</div>
+<div id="highscore-list"></div>
+<button class="btn pause-action" id="highscore-clear-btn">CLEAR SCORES</button>
+<button class="btn pause-action" id="highscore-back-btn">BACK</button>
 </div>
 
 <div id="diff-panel">
@@ -78,7 +105,10 @@
 <div>Destroyed <span id="final-kills">0</span> foes</div>
 <div>Reached Level <span id="final-level">0</span></div>
 </div>
+<div id="gameover-actions">
 <button class="btn" id="restart-btn">RISE AGAIN</button>
+<button class="btn" id="gameover-menu-btn">GO TO MENU</button>
+</div>
 </div>
 </div>
 

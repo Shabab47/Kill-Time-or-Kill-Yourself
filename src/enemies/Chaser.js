@@ -3,7 +3,9 @@ class ChaserEnemy extends Enemy {
     super.update(dt, player, enemies, projectiles, particles, cam, audio);
     if (!this.alive) return;
     const d = dist(this, player);
-    if (player.alive && d > this.size + player.size + 5) {
+    // Chase into full contact range (≤ size+player.size) so hordes press against
+    // the player rather than stopping 5px out of contact-damage range.
+    if (player.alive && d > this.size + player.size) {
       const a = angle(this, player);
       this.x += Math.cos(a) * this.speed * dt;
       this.y += Math.sin(a) * this.speed * dt;
@@ -68,7 +70,7 @@ class Skeleton extends ChaserEnemy {
       this.animFrame = 0;
     } else {
       const d = dist(this, player);
-      if (player.alive && d > this.size + player.size + 5) {
+      if (player.alive && d > this.size + player.size) {
         this.animState = 'run';
         this.animTimer -= dt;
         if (this.animTimer <= 0) {

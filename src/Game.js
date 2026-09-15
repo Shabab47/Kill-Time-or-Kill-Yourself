@@ -7,6 +7,7 @@ class Game {
     this.cacheUiElements();
     this.state = 'menu';
     this.gameTime = 0;
+    this.latestRunRank = -1;
   }
 
   // Single place that (re)initializes everything belonging to one playthrough,
@@ -272,6 +273,14 @@ class Game {
     this.ui.finalWavesLabel.textContent = Math.max(0, this.waveManager.wave - 1);
     this.ui.finalKillsLabel.textContent = this.kills;
     this.ui.finalLevelLabel.textContent = this.level;
+    // Record the run into the persistent local high-score table.
+    this.latestRunRank = addHighScore({
+      difficulty: this.difficultyId,
+      time: this.gameTime,
+      waves: Math.max(0, this.waveManager.wave - 1),
+      kills: this.kills,
+      level: this.level
+    });
     this.particles.emitExplosion(this.player.x, this.player.y, 80, { speed: 250, count: 40, color: '#c62828', life: 0.8, size: 6 });
   }
 
@@ -452,6 +461,11 @@ class Game {
     this.resetRunState();
     this.setElementVisible(this.ui.pausePanel, false);
     this.setElementVisible(this.ui.gameOverScreen, false);
+    const optionsPanel = document.getElementById('options-panel');
+    if (optionsPanel) optionsPanel.classList.remove('show');
+    const highscorePanel = document.getElementById('highscore-panel');
+    if (highscorePanel) highscorePanel.classList.remove('show');
+    document.getElementById('exit-note').textContent = '';
     this.setElementVisible(this.ui.startScreen, true);
   }
 
@@ -510,7 +524,10 @@ class Game {
       enemy.update(deltaTime, this.player, this.enemies, this.projectiles, this.particles, this.cam, audio);
       this.pushApartFromObstacles(enemy);
       // Body contact damages the player unless the enemy is already dying.
-      if (this.player.alive && !enemy.dying && dist(this.player, enemy) < this.player.size + enemy.size) {
+      // The +1 tolerance matches the enemies' press-in stop distance, so foes
+      // that close to their contact radius actually land damage (previously they
+      // parked 5px out of range and the player never took contact hits).
+      if (this.player.alive && !enemy.dying && dist(this.player, enemy) <= this.player.size + enemy.size + 1) {
         this.damagePlayer(enemy.damage, enemy);
       }
     }
@@ -837,9 +854,130 @@ class Game {
 const game = new Game();
 let chosenDifficulty = 'midnight';
 
-document.getElementById('start-btn').addEventListener('click', () => {
+// Persistent high-score table (localStorage). Sorted by survival time, then kills.
+const HIGHSCORE_KEY = 'ktoKys.highscores';
+const MAX_HIGHSCORES = 10;
+const DIFFICULTY_ORDER = ['dusk', 'midnight', 'void', 'oblivion'];
+const DIFFICULTY_LABEL = { dusk: 'Dusk', midnight: 'Midnight', void: 'Void', oblivion: 'Oblivion' };
+// Which difficulty's board is currently displayed; pre-1.x saved runs (no
+// difficulty field) are treated as Midnight.
+let selectedHighscoreDifficulty = 'midnight';
+const scoreDifficulty = (s) => DIFFICULTY_ORDER.includes(s.difficulty) ? s.difficulty : 'midnight';
+
+function loadHighScores() {
+  try {
+    const raw = localStorage.getItem(HIGHSCORE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveHighScores(scores) {
+  try { localStorage.setItem(HIGHSCORE_KEY, JSON.stringify(scores)); } catch (e) { /* storage unavailable */ }
+}
+
+function addHighScore(run) {
+  const scores = loadHighScores();
+  scores.push({ difficulty: scoreDifficulty(run), time: run.time, waves: run.waves, kills: run.kills, level: run.level });
+  scores.sort((a, b) => b.time - a.time || b.kills - a.kills);
+  if (scores.length > MAX_HIGHSCORES) scores.length = MAX_HIGHSCORES;
+  saveHighScores(scores);
+  // Open the board matching the just-finished run and return its rank there.
+  selectedHighscoreDifficulty = scoreDifficulty(run);
+  const board = scores.filter((s) => scoreDifficulty(s) === selectedHighscoreDifficulty);
+  return board.indexOf(board.find((s) => s.time === run.time && s.kills === run.kills));
+}
+
+function formatRunTime(seconds) {
+  const total = Math.floor(seconds) || 0;
+  return Math.floor(total / 60) + ':' + (total % 60).toString().padStart(2, '0');
+}
+
+function renderHighScores(highlightIndex) {
+  const list = document.getElementById('highscore-list');
+  const scores = loadHighScores().filter((s) => scoreDifficulty(s) === selectedHighscoreDifficulty);
+  for (const tab of document.querySelectorAll('#highscore-tabs .hs-tab')) {
+    tab.classList.toggle('active', tab.dataset.diff === selectedHighscoreDifficulty);
+  }
+  if (!scores.length) {
+    list.innerHTML = '<div class="highscore-empty">No souls have been claimed on '
+      + DIFFICULTY_LABEL[selectedHighscoreDifficulty] + ' yet.<br>The darkness still waits to be tested.</div>';
+    return;
+  }
+  list.innerHTML = scores.map((s, i) => `
+    <div class="highscore-row${i === highlightIndex ? ' me' : ''}">
+      <span class="rank">${i + 1}.</span>
+      <span class="time">${formatRunTime(s.time)}</span>
+      <span class="stat">Wave ${s.waves || 0}</span>
+      <span class="stat">${s.kills || 0} kills</span>
+      <span class="stat">Lv ${s.level || 1}</span>
+    </div>`).join('');
+}
+
+document.getElementById('menu-highscores').addEventListener('click', () => {
+  renderHighScores(game.latestRunRank);
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('highscore-panel').classList.add('show');
+});
+
+document.getElementById('highscore-tabs').addEventListener('click', (e) => {
+  const tab = e.target.closest('.hs-tab');
+  if (!tab) return;
+  selectedHighscoreDifficulty = tab.dataset.diff;
+  renderHighScores(-1);
+});
+
+document.getElementById('highscore-back-btn').addEventListener('click', () => {
+  document.getElementById('highscore-panel').classList.remove('show');
+  document.getElementById('start-screen').style.display = 'flex';
+});
+
+document.getElementById('highscore-clear-btn').addEventListener('click', () => {
+  if (!confirm(`Erase all ${DIFFICULTY_LABEL[selectedHighscoreDifficulty]} souls?`)) return;
+  const remaining = loadHighScores().filter((s) => scoreDifficulty(s) !== selectedHighscoreDifficulty);
+  saveHighScores(remaining);
+  renderHighScores(-1);
+});
+
+document.getElementById('menu-start').addEventListener('click', () => {
   document.getElementById('start-screen').style.display = 'none';
   document.getElementById('diff-panel').style.display = 'flex';
+});
+
+// OPTIONS — opens the options overlay from the main menu.
+document.getElementById('menu-options').addEventListener('click', () => {
+  const soundBtn = document.getElementById('options-sound-btn');
+  soundBtn.textContent = audio.enabled ? 'SOUND: ON' : 'SOUND: OFF';
+  document.getElementById('start-screen').style.display = 'none';
+  document.getElementById('exit-note').textContent = '';
+  document.getElementById('options-panel').classList.add('show');
+});
+
+document.getElementById('options-back-btn').addEventListener('click', () => {
+  document.getElementById('options-panel').classList.remove('show');
+  document.getElementById('start-screen').style.display = 'flex';
+});
+
+document.getElementById('options-sound-btn').addEventListener('click', function () {
+  const enabled = audio.toggle();
+  this.textContent = enabled ? 'SOUND: ON' : 'SOUND: OFF';
+  if (document.getElementById('pause-panel').style.display === 'flex') {
+    document.getElementById('sound-btn').textContent = enabled ? 'SOUND: ON' : 'SOUND: OFF';
+  }
+});
+
+// EXIT — browsers only allow scripted close of script-opened windows, so fall
+// back to a hint that the player should close the tab.
+document.getElementById('menu-exit').addEventListener('click', () => {
+  const note = document.getElementById('exit-note');
+  try { window.close(); } catch (e) { /* ignored */ }
+  setTimeout(() => {
+    if (document.visibilityState !== 'hidden') {
+      note.textContent = 'This tab cannot close itself — press Alt+F4 (or close the tab).';
+    }
+  }, 150);
 });
 
 // Build the character cards from config (portraits + blurbs).
@@ -874,6 +1012,7 @@ document.getElementById('diff-choices').addEventListener('click', e => {
   document.getElementById('char-panel').style.display = 'flex';
 });
 document.getElementById('restart-btn').addEventListener('click', () => { audio.init(); game.start(game.difficultyId, game.characterId); });
+document.getElementById('gameover-menu-btn').addEventListener('click', () => game.goToMenu());
 document.getElementById('resume-btn').addEventListener('click', () => game.togglePause());
 document.getElementById('pause-restart-btn').addEventListener('click', () => { audio.init(); game.start(game.difficultyId, game.characterId); });
 document.getElementById('menu-btn').addEventListener('click', () => game.goToMenu());

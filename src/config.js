@@ -21,7 +21,11 @@ const G = {
   // Vampire-Survivors-style limits
   maxWeapons: 4,
   maxPassives: 5,
+  maxEnemies: 300,          // hard cap on concurrent active enemies; spawns pause above this
+  edgeSpawnMargin: 80,      // enemies spawn just past the camera's visible edge
+  spawnSmoothing: 0.14159265, // golden-ratio-ish stride: spreads spawns evenly along edges
   timeScaleWaveBonus: 45,   // every N seconds survived adds +1 effective spawn wave
+  spaceBetweenWaves: 0.8,   // breather seconds between timed waves
   despawnDistance: 1400     // enemies left this far behind vanish silently
 };
 

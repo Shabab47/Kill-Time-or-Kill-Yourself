@@ -64,7 +64,7 @@ class Lich extends Enemy {
   }
 
   phase1Behavior(dt, player, particles) {
-    if (player.alive && dist(this, player) > this.size + player.size + 5) {
+    if (player.alive && dist(this, player) > this.size + player.size) {
       const a = angle(this, player);
       this.x += Math.cos(a) * this.speed * dt;
       this.y += Math.sin(a) * this.speed * dt;

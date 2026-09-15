@@ -25,12 +25,39 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 #wave-announce span{font-size:16px;font-weight:400;color:#9e9e9e;display:block;margin-top:8px;letter-spacing:2px}
 #swarm-banner{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);font-size:34px;font-weight:900;color:#c9a84c;text-shadow:0 0 40px rgba(201,168,76,0.4),0 2px 10px rgba(0,0,0,0.8);pointer-events:none;opacity:0;transition:opacity 0.3s;letter-spacing:3px;text-align:center;white-space:nowrap}
 #swarm-banner.show{opacity:1}
-#start-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#050505;z-index:10;gap:20px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#start-screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;background:url('../assets/menu/KtoKys.png') center/cover no-repeat #050505;z-index:10;gap:18px;padding:8vh 7vw;border:1px solid rgba(201,168,76,0.15);overflow:hidden}
+#start-screen::before{content:'';position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(5,5,5,0.92) 0%,rgba(5,5,5,0.7) 40%,rgba(5,5,5,0.25) 75%,rgba(5,5,5,0.4) 100%)}
+#start-screen > *{position:relative;z-index:2}
 #game-over{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,5,0.92);z-index:10;gap:20px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
-#start-screen h1{font-size:clamp(36px,8vw,72px);font-weight:900;color:#c62828;text-shadow:0 0 60px rgba(198,40,40,0.3),0 0 120px rgba(198,40,40,0.1);letter-spacing:4px;text-align:center}
-#start-screen .subtitle{color:#7e7e7e;font-size:clamp(14px,2.5vw,18px);text-align:center;max-width:450px;letter-spacing:1px;line-height:1.6}
-#start-screen .controls-info{color:#4a4a4a;font-size:12px;text-align:center;margin-top:10px;letter-spacing:0.5px}
-#diff-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,5,0.92);z-index:10;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#start-screen h1{font-size:clamp(36px,8vw,72px);font-weight:900;color:#c62828;text-shadow:0 0 60px rgba(198,40,40,0.35),0 0 120px rgba(198,40,40,0.15),0 2px 10px rgba(0,0,0,0.8);letter-spacing:4px;text-align:left;max-width:700px;line-height:1.05}
+#start-screen .subtitle{color:#c8c8c8;font-size:clamp(14px,2.5vw,18px);text-align:left;max-width:440px;letter-spacing:1px;line-height:1.6;text-shadow:0 2px 6px rgba(0,0,0,0.9)}
+#start-screen .controls-info{color:#9a9a9a;font-size:12px;text-align:left;margin-top:6px;letter-spacing:0.5px;text-shadow:0 1px 4px rgba(0,0,0,0.9)}
+#menu-column{display:flex;flex-direction:column;gap:14px;width:min(300px,80vw);margin-top:10px}
+#menu-column .btn{padding:14px 32px;font-size:19px;text-align:left;letter-spacing:3px;width:100%}
+#menu-column .btn.exit{color:#8a2f2f;border-color:rgba(198,40,40,0.2)}
+#menu-column .btn.exit:hover{border-color:rgba(198,40,40,0.7);box-shadow:0 6px 30px rgba(198,40,40,0.35)}
+#options-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(rgba(5,5,5,0.9),rgba(5,5,5,0.9)),url('../assets/menu/KtoKys.png') center/cover no-repeat;z-index:11;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#options-panel.show{display:flex}
+#options-panel h2{font-size:48px;color:#c62828;text-shadow:0 0 30px rgba(198,40,40,0.3);letter-spacing:4px}
+#options-actions{display:flex;flex-direction:column;gap:12px;align-items:center}
+#exit-note{color:#7e7e7e;font-size:13px;letter-spacing:1px;min-height:18px}
+#highscore-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(rgba(5,5,5,0.9),rgba(5,5,5,0.9)),url('../assets/menu/KtoKys.png') center/cover no-repeat;z-index:11;gap:18px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#highscore-panel.show{display:flex}
+#highscore-panel h2{font-size:48px;color:#c62828;text-shadow:0 0 30px rgba(198,40,40,0.3);letter-spacing:4px}
+#highscore-tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.hs-tab{background:rgba(40,40,40,0.3);border:1px solid rgba(201,168,76,0.2);color:#9a9a9a;font-size:13px;letter-spacing:1px;padding:7px 16px;border-radius:4px;cursor:pointer;font-family:inherit;transition:all .15s}
+.hs-tab:hover{color:#c9a84c;border-color:rgba(201,168,76,0.5)}
+.hs-tab.active{color:#c9a84c;border-color:#c9a84c;background:rgba(201,168,76,0.12);box-shadow:0 0 12px rgba(201,168,76,0.2)}
+#gameover-actions{display:flex;flex-direction:column;gap:12px;align-items:center;width:min(260px,80vw)}
+#highscore-list{display:flex;flex-direction:column;gap:6px;width:min(460px,86vw);max-height:46vh;overflow-y:auto;padding:6px}
+.highscore-row{display:grid;grid-template-columns:36px 1fr 80px 72px 72px;gap:12px;align-items:center;background:rgba(40,40,40,0.12);border:1px solid rgba(201,168,76,0.12);border-radius:4px;padding:8px 14px;color:#c8c8c8;font-size:14px;letter-spacing:0.5px}
+.highscore-row .rank{color:#c9a84c;font-weight:700;font-size:16px}
+.highscore-row .time{color:#c9a84c;font-weight:700;font-variant-numeric:tabular-nums}
+.highscore-row .stat{color:#7e7e7e;font-size:12px;text-align:right}
+.highscore-row.me{border-color:rgba(198,40,40,0.55);background:rgba(198,40,40,0.12);box-shadow:0 0 18px rgba(198,40,40,0.15)}
+.highscore-empty{color:#6a6a6a;font-size:15px;letter-spacing:1px;text-align:center;padding:22px}
+#highscore-panel .btn{margin-top:2px}
+#diff-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(rgba(5,5,5,0.88),rgba(5,5,5,0.88)),url('../assets/menu/KtoKys.png') center/cover no-repeat;z-index:10;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
 #diff-panel h2{font-size:36px;color:#c62828;text-shadow:0 0 20px rgba(198,40,40,0.3);letter-spacing:3px}
 #pause-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,5,0.85);z-index:10;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
 #pause-panel h2{font-size:48px;color:#c9a84c;text-shadow:0 0 30px rgba(201,168,76,0.2);letter-spacing:4px}
@@ -57,7 +84,7 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .upgrade-card .name{color:#c9a84c;font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:1px}
 .upgrade-card .desc{color:#7e7e7e;font-size:12px;line-height:1.5}
 .upgrade-card .level-badge{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:2px;background:rgba(40,40,40,0.25);color:#c62828;font-size:11px;font-weight:700;letter-spacing:1px}
-#char-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(5,5,5,0.92);z-index:10;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#char-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(rgba(5,5,5,0.88),rgba(5,5,5,0.88)),url('../assets/menu/KtoKys.png') center/cover no-repeat;z-index:10;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
 #char-panel h2{font-size:36px;color:#c62828;text-shadow:0 0 20px rgba(198,40,40,0.3);letter-spacing:3px}
 #char-choices{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:720px}
 .char-btn{background:rgba(40,40,40,0.08);border:1px solid rgba(201,168,76,0.15);border-radius:4px;padding:18px;width:190px;cursor:pointer;transition:all 0.25s;display:flex;flex-direction:column;align-items:center;gap:8px;font-family:'Cinzel','Georgia',serif}
