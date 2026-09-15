@@ -169,13 +169,44 @@ class Game {
       card.innerHTML += `
         <div class="icon">${entry.icon}</div>
         <div class="name">${entry.name}</div>
-        <div class="desc">${entry.desc || ''}</div>
         <div class="level-badge">${badge}</div>
       `;
+      // Hover reveals what the upgrade does.
+      card.addEventListener('mouseenter', () => this.showUpgradeTooltip(entry, card));
+      card.addEventListener('mousemove', (event) => this.moveUpgradeTooltip(event));
+      card.addEventListener('mouseleave', () => this.hideUpgradeTooltip());
       card.addEventListener('click', () => this.applyUpgrade(entry));
       container.appendChild(card);
     }
     this.setElementVisible(this.ui.upgradePanel, true);
+  }
+
+  showUpgradeTooltip(entry, card) {
+    const tooltip = document.getElementById('upgrade-tooltip');
+    const owned = entry.kind === 'weapon'
+      ? (this.player.weapons[entry.id] || 0)
+      : (this.player.passives[entry.id] || 0);
+    const heading = owned === 0
+      ? `${entry.icon} ${entry.name}`
+      : `${entry.icon} ${entry.name} — Lv.${owned} → ${owned + 1}`;
+    tooltip.innerHTML = `<div class="tt-title">${heading}</div><div class="tt-desc">${entry.desc || ''}</div>`;
+    tooltip.classList.add('show');
+    const rect = card.getBoundingClientRect();
+    this.positionUpgradeTooltip(rect.left + rect.width / 2, rect.top - 8);
+  }
+
+  moveUpgradeTooltip(event) {
+    this.positionUpgradeTooltip(event.clientX, event.clientY);
+  }
+
+  positionUpgradeTooltip(clientX, clientY) {
+    const tooltip = document.getElementById('upgrade-tooltip');
+    tooltip.style.left = (clientX + 16) + 'px';
+    tooltip.style.top = (clientY + 16) + 'px';
+  }
+
+  hideUpgradeTooltip() {
+    document.getElementById('upgrade-tooltip').classList.remove('show');
   }
 
   // Treasure chest: grants 1/3/5 instant upgrades with a fanfare.

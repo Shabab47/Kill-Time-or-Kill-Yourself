@@ -39,57 +39,57 @@ function xpForLevel(l) {
 // behaviour lives in Game.updateWeapons.
 // ---------------------------------------------------------------------------
 
-function weaponEntry(id, name, icon, maxLevel, applyFn) {
-  return { kind: 'weapon', id, name, icon, maxLevel, apply: applyFn };
+function weaponEntry(id, name, icon, desc, maxLevel, applyFn) {
+  return { kind: 'weapon', id, name, icon, desc, maxLevel, apply: applyFn };
 }
 
 const WEAPONS = [
-  weaponEntry('scythe', 'Soul Scythe', '💀', 8, (p) => {
+  weaponEntry('scythe', 'Soul Scythe', '💀', 'Slash the foe ahead with a spectral scythe, sweeping multiple targets.', 8, (p) => {
     const lvl = p.weapons.scythe;
     p.scytheSwings = 1 + Math.floor(lvl / 3);          // extra quick swings
     p.scytheTargets = 1 + Math.floor(lvl / 2);
     p.scytheDamageMult = 1 + 0.15 * (lvl - 1);
     p.attackRange = G.playerBase.attackRange * (1 + 0.06 * (lvl - 1));
   }),
-  weaponEntry('whip', 'Phantom Whip', '🗡️', 8, (p) => {
+  weaponEntry('whip', 'Phantom Whip', '🗡️', 'Lash a line of shadow through every enemy in front of you.', 8, (p) => {
     const lvl = p.weapons.whip;
     p.whipDamage = 14 * (1 + 0.35 * (lvl - 1));
     p.whipReach = 95 + 14 * lvl;
     p.whipHitsBothSides = lvl >= 4;
     p.whipInterval = Math.max(0.55, 1.3 - 0.09 * lvl);
   }),
-  weaponEntry('axe', "Reaper's Axe", '🪓', 8, (p) => {
+  weaponEntry('axe', "Reaper's Axe", '🪓', 'Hurl a heavy axe that arcs over the horde and strikes as it falls.', 8, (p) => {
     const lvl = p.weapons.axe;
     p.axeCount = 1 + Math.floor((lvl - 1) / 3);
     p.axeDamage = 22 * (1 + 0.3 * (lvl - 1));
     p.axeInterval = Math.max(0.7, 1.5 - 0.1 * lvl);
   }),
-  weaponEntry('garlic', 'Hellfire Aura', '🔥', 8, (p) => {
+  weaponEntry('garlic', 'Hellfire Aura', '🔥', 'Cloak yourself in hellfire that scorches anything close by.', 8, (p) => {
     const lvl = p.weapons.garlic;
     p.garlicRadius = (60 + 9 * lvl) * p.aoeRadiusMult;
     p.garlicDamage = 4 + 2.2 * (lvl - 1);
     p.garlicTick = Math.max(0.25, 0.5 - 0.03 * lvl);
   }),
-  weaponEntry('firewand', 'Fire Wand', '🧨', 8, (p) => {
+  weaponEntry('firewand', 'Fire Wand', '🧨', 'Hurl a burning bolt of fire at the nearest foe.', 8, (p) => {
     const lvl = p.weapons.firewand;
     p.firewandCount = 1 + Math.floor((lvl - 1) / 4);
     p.firewandDamage = 30 * (1 + 0.28 * (lvl - 1));
     p.firewandInterval = Math.max(0.9, 2.4 - 0.18 * lvl);
   }),
-  weaponEntry('soulArrow', 'Soul Arrow', '🔮', 8, (p) => {
+  weaponEntry('soulArrow', 'Soul Arrow', '🔮', 'Fire a seeking soul arrow at the closest enemy.', 8, (p) => {
     const lvl = p.weapons.soulArrow;
     p.soulArrowCount = 1 + Math.floor(lvl / 3);
     p.soulArrowDamage = 10 * Math.pow(1.25, lvl - 1);
     p.soulArrowInterval = Math.max(0.7, 1.5 - 0.1 * lvl);
   }),
-  weaponEntry('orbital', 'Infernal Orbit', '🌑', 8, (p) => {
+  weaponEntry('orbital', 'Infernal Orbit', '🌑', 'Conjure shadow orbs that orbit you, grinding whatever they touch.', 8, (p) => {
     const lvl = p.weapons.orbital;
     p.orbitalCount = Math.min(lvl, 6);
     p.orbitalDamage = 10 * Math.pow(1.4, lvl - 1);
     p.orbitalRadius = 80 + 5 * lvl;
     p.orbitalSpeed = 3 + 0.15 * lvl;
   }),
-  weaponEntry('lightning', 'Divine Wrath', '⚡', 8, (p) => {
+  weaponEntry('lightning', 'Divine Wrath', '⚡', 'Smite the nearest foes with lances of holy lightning.', 8, (p) => {
     const lvl = p.weapons.lightning;
     p.lightningStrikeCount = Math.min(1 + Math.floor((lvl - 1) / 2), 5);
     p.lightningStrikeDamage = 25 * Math.pow(1.28, lvl - 1);
@@ -101,22 +101,23 @@ const WEAPONS = [
 // PASSIVES — stat boosters, up to G.maxPassives held.
 // ---------------------------------------------------------------------------
 
-function passiveEntry(id, name, icon, maxLevel, applyFn) {
-  return { kind: 'passive', id, name, icon, maxLevel, apply: applyFn };
+function passiveEntry(id, name, icon, desc, maxLevel, applyFn) {
+  return { kind: 'passive', id, name, icon, desc, maxLevel, apply: applyFn };
 }
 
 const PASSIVES = [
-  passiveEntry('might', 'Blood Pact', '🗡️', 5, (p) => { p.damageMult *= 1.12; }),
-  passiveEntry('armor', 'Dark Aegis', '⚰️', 5, (p) => { p.armorMult *= 0.9; }),
-  passiveEntry('vitality', 'Vampiric Rite', '🩸', 5, (p) => { p.maxHp += 20; p.hp += 20; }),
-  passiveEntry('recovery', 'Necrotic Boon', '💚', 5, (p) => { p.regen += 1.5; }),
-  passiveEntry('alacrity', 'Alacrity', '⏳', 5, (p) => { p.cooldownMult *= 0.92; }),
-  passiveEntry('reach', 'Hellfire Reach', '💫', 5, (p) => {
+  passiveEntry('might', 'Blood Pact', '🗡️', '+12% damage dealt.', 5, (p) => { p.damageMult *= 1.12; }),
+  passiveEntry('armor', 'Dark Aegis', '⚰️', 'Incoming damage reduced by 10%.', 5, (p) => { p.armorMult *= 0.9; }),
+  passiveEntry('vitality', 'Vampiric Rite', '🩸', '+20 maximum HP and instantly heal 20.', 5, (p) => { p.maxHp += 20; p.hp += 20; }),
+  passiveEntry('lifesteal', 'Vampiric Thirst', '🧛', 'Heal for 10% of the damage you deal to enemies.', 5, (p) => { p.lifesteal += 0.1; }),
+  passiveEntry('recovery', "Hydra's Blessing", '🐍', 'Regenerate 1.5 HP per second.', 5, (p) => { p.regen += 1.5; }),
+  passiveEntry('alacrity', 'Alacrity', '⏳', 'All weapons cool down 8% faster.', 5, (p) => { p.cooldownMult *= 0.92; }),
+  passiveEntry('reach', 'Hellfire Reach', '💫', 'Area of effect grows 12% larger.', 5, (p) => {
     p.aoeRadiusMult *= 1.12;
     if (p.weapons.garlic) p.garlicRadius *= 1.12;   // keep aura radius in sync
   }),
-  passiveEntry('swiftness', 'Ghostwalk', '🌪️', 5, (p) => { p.speedMult *= 1.08; }),
-  passiveEntry('magnet', 'Soul Lantern', '🕯️', 5, (p) => { p.magnetRange *= 1.25; }),
+  passiveEntry('swiftness', 'Ghostwalk', '🌪️', 'Move 8% faster.', 5, (p) => { p.speedMult *= 1.08; }),
+  passiveEntry('magnet', 'Soul Lantern', '🕯️', 'Pickup collection range widens 25%.', 5, (p) => { p.magnetRange *= 1.25; }),
 ];
 
 // Lookup helpers -------------------------------------------------------------

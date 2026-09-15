@@ -82,8 +82,11 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .upgrade-card:hover{background:rgba(40,40,40,0.2);border-color:rgba(201,168,76,0.5);transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,0.5)}
 .upgrade-card .icon{font-size:36px;margin-bottom:8px}
 .upgrade-card .name{color:#c9a84c;font-size:15px;font-weight:700;margin-bottom:4px;letter-spacing:1px}
-.upgrade-card .desc{color:#7e7e7e;font-size:12px;line-height:1.5}
 .upgrade-card .level-badge{display:inline-block;margin-top:8px;padding:2px 10px;border-radius:2px;background:rgba(40,40,40,0.25);color:#c62828;font-size:11px;font-weight:700;letter-spacing:1px}
+#upgrade-tooltip{position:fixed;z-index:99;display:none;max-width:240px;padding:10px 14px;pointer-events:none;background:rgba(12,12,12,0.95);border:1px solid rgba(201,168,76,0.4);border-radius:4px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+#upgrade-tooltip.show{display:block}
+#upgrade-tooltip .tt-title{color:#c9a84c;font-size:13px;font-weight:700;letter-spacing:1px;margin-bottom:4px}
+#upgrade-tooltip .tt-desc{color:#c8c8c8;font-size:12px;line-height:1.5}
 #char-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(rgba(5,5,5,0.88),rgba(5,5,5,0.88)),url('../assets/menu/KtoKys.png') center/cover no-repeat;z-index:10;gap:24px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
 #char-panel h2{font-size:36px;color:#c62828;text-shadow:0 0 20px rgba(198,40,40,0.3);letter-spacing:3px}
 #char-choices{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:720px}

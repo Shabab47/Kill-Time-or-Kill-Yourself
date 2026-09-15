@@ -53,7 +53,8 @@ Weapons only appear as *new* picks while you have free slots; after that they le
 | 🗡️ Blood Pact (Might) | +12% damage |
 | ⚰️ Dark Aegis (Armor) | −10% damage taken |
 | 🩸 Vampiric Rite (Vitality) | +20 max HP (and heals 20) |
-| 💚 Necrotic Boon (Recovery) | +1.5 HP/sec regen |
+| 🧛 Vampiric Thirst (Lifesteal) | heal 10% of damage dealt to enemies |
+| 🐍 Hydra's Blessing (Recovery) | +1.5 HP/sec regen |
 | ⏳ Alacrity | −8% cooldown on ALL weapons |
 | 💫 Hellfire Reach (Area) | +12% area of effect |
 | 🌪️ Ghostwalk (Swiftness) | +8% move speed |
