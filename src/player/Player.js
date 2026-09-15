@@ -68,6 +68,10 @@ class Player {
     this.dashFrameTimer = 0;
     this.dashFrame = 0;         // alternates 0/1 between the 'jump' and 'fall' sheets
     this.attackAnimTimer = 0;   // counts down while the slash pose should be shown
+    this.attackAnimMax = 0;     // total swing duration (for the scythe frame cycle)
+    this.lastAttackAngle = 0;   // facing angle of the most recent swing
+    this.scytheLinger = 0.35;   // extra seconds the swing visual stays after the pose
+    this.scytheOverlay = 0;     // combined countdown for the scythe + aura visuals
 
     // Character selection: grants the starting weapon and its passive bonus.
     if (character) {
@@ -105,6 +109,7 @@ class Player {
     this.invincibleTimer -= deltaTime;
     this.dashCooldown -= deltaTime;
     this.attackAnimTimer -= deltaTime;
+    if (this.scytheOverlay > 0) this.scytheOverlay -= deltaTime;
 
     // Haste stacks each expire independently: when one runs out, one stack's
     // speed bonus is removed and the next stack's timer restarts.
@@ -173,8 +178,8 @@ class Player {
   }
 
   // Auto-attacks the closest enemy in range whenever the attack cooldown is
-  // ready. Scythe level widens the cleave (`scytheTargets`) and adds extra
-  // quick swings (`scytheSwings`); Might multiplies the damage dealt.
+  // ready. Everything inside the scythe's swung swath takes the full slash
+  // damage; anything else within the swing's reach takes lighter aura damage.
   attackNearestEnemy(deltaTime, enemies, particles, cam, audio, floatingNumbers) {
     this.attackTimer -= deltaTime;
     const target = findNearestEnemy(this, enemies, this.attackRange);
@@ -184,26 +189,55 @@ class Player {
     const targetAngle = angle(this, target);
     this.facing = angleToDir8(targetAngle);
     this.attackAnimTimer = Math.min(0.25, this.attackSpeed * 0.8);
+    this.attackAnimMax = this.attackAnimTimer;
+    this.lastAttackAngle = targetAngle;
+    this.scytheOverlay = this.attackAnimTimer + this.scytheLinger;
     audio.play('slash');
 
-    const swingTargets = enemies
-      .filter((enemy) => enemy.alive && dist(this, enemy) <= this.attackRange)
-      .sort((enemyA, enemyB) => dist(this, enemyA) - dist(this, enemyB))
-      .slice(0, this.scytheTargets);
-
+    // Blade swath: the scythe pivots size*1.6 ahead of the player and sweeps
+    // ±bladeHalfArc around the facing. The aura covers a slightly wider forward
+    // arc; anything behind the player is never hit. Same geometry the swing
+    // overlay is drawn at.
     const slashDamage = this.damage * this.scytheDamageMult;
-    for (let swingIndex = 0; swingIndex < this.scytheSwings; swingIndex++) {
-      for (const enemy of swingTargets) {
-        if (!enemy.alive) continue;
+    const auraDamage = slashDamage * 0.5;
+    const pivotDist = this.size * 1.6;
+    const scy = sprites.scythe;
+    const bladeLen = (scy && scy.w > 0)
+      ? scy.w / scy.h * this.size * 4.4   // matches the draw size in render/player.js
+      : this.size * 4.4;
+    const bladeHalfArc = 0.95;          // matches the visible sweep (±1.8 rad total)
+    const auraHalfArc = 1.15;           // forward reach only; no side/back hits
 
-        enemy.takeDamage(slashDamage, this, particles, cam, audio);
+    for (let swingIndex = 0; swingIndex < this.scytheSwings; swingIndex++) {
+      for (const enemy of enemies) {
+        if (!enemy.alive) continue;
+        const enemyDist = dist(this, enemy);
+        if (enemyDist > this.attackRange) continue;
+
+        const enemyAngle = angle(this, enemy);
+        const angleDiff = Math.atan2(
+          Math.sin(enemyAngle - targetAngle),
+          Math.cos(enemyAngle - targetAngle)
+        );
+        if (Math.abs(angleDiff) > auraHalfArc) continue;
+
+        const insideBlade = enemyDist >= pivotDist - this.size * 0.5
+          && enemyDist <= pivotDist + bladeLen + this.size * 0.5
+          && Math.abs(angleDiff) <= bladeHalfArc;
+        const damageToEnemy = insideBlade ? slashDamage : auraDamage;
+
+        enemy.takeDamage(damageToEnemy, this, particles, cam, audio);
         if (floatingNumbers) {
-          floatingNumbers.push(new FloatingNumber(enemy.x, enemy.y - enemy.size - 8, Math.round(slashDamage).toString(), '#5ce1ff'));
+          floatingNumbers.push(new FloatingNumber(
+            enemy.x, enemy.y - enemy.size - 8,
+            Math.round(damageToEnemy).toString(),
+            insideBlade ? '#5ce1ff' : '#4fc3f7'
+          ));
         }
-        applyLifesteal(this, slashDamage);
+        applyLifesteal(this, damageToEnemy);
 
         if (Math.random() < this.explosiveChance) {
-          detonateExplosion(enemy.x, enemy.y, slashDamage, this, enemy, enemies, particles, cam, audio);
+          detonateExplosion(enemy.x, enemy.y, damageToEnemy, this, enemy, enemies, particles, cam, audio);
         }
       }
     }

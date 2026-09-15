@@ -32,6 +32,56 @@ function renderPlayer(ctx, game) {
     ctx.fill();
   }
 
+  // Scythe swing overlay: the handle (left edge) pivots close to the player
+  // while the blade sweeps around; the aura marks the arc the blade reaches.
+  if (p.scytheOverlay > 0 && p.attackAnimMax > 0) {
+    const total = p.attackAnimMax + p.scytheLinger;
+    const progress = 1 - Math.max(0, p.scytheOverlay) / total;
+    // Fade out only during the very last stretch of the lingering tail.
+    const fade = progress > 0.85 ? 1 - (progress - 0.85) / 0.15 : 1;
+    // The swing itself completes early into the overlay, then holds in place
+    // while the tail fades — reads as a faster, snappier slash.
+    const swingP = Math.min(1, progress * 1.8);
+
+    // Aura — sits out at the blade's reach, sized to cover the whole swing.
+    const aura = sprites.scytheAura;
+    if (aura && aura.ready && aura.w > 0) {
+      const range = p.attackRange;
+      const centerX = p.x + Math.cos(p.lastAttackAngle) * range * 0.62;
+      const centerY = p.y + Math.sin(p.lastAttackAngle) * range * 0.62;
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(p.lastAttackAngle);
+      ctx.shadowColor = 'rgba(92,225,255,0.9)';
+      ctx.shadowBlur = 20;
+      ctx.globalAlpha = 0.85 * fade;
+      // Width (across the swing arc) is enlarged; the reach extent stays natural.
+      const h = range * 1.4;
+      const w = aura.w / aura.h * h;
+      ctx.drawImage(aura.img, -w / 2, -h / 2, w, h);
+      ctx.restore();
+    }
+
+    // Scythe — left (handle) end sits on the pivot, the rest swings through.
+    const scy = sprites.scythe;
+    if (scy && scy.ready && scy.w > 0) {
+      const sweep = p.lastAttackAngle + (swingP - 0.5) * 1.8;
+      // Pivot sits clear of the player's body so the handle never overlaps.
+      const pivotX = p.x + Math.cos(p.lastAttackAngle) * p.size * 1.6;
+      const pivotY = p.y + Math.sin(p.lastAttackAngle) * p.size * 1.6;
+      ctx.save();
+      ctx.translate(pivotX, pivotY);
+      ctx.rotate(sweep);
+      ctx.shadowColor = 'rgba(92,225,255,0.8)';
+      ctx.shadowBlur = 14;
+      ctx.globalAlpha = fade;
+      const h = p.size * 4.4;
+      const w = scy.w / scy.h * h;
+      ctx.drawImage(scy.img, 0, -h / 2, w, h);     // handle edge on the pivot
+      ctx.restore();
+    }
+  }
+
   if (p.shieldActive) {
     const r = p.size * 3.5;
     const pulse = 0.35 + Math.sin(Date.now() * 0.004) * 0.15;
