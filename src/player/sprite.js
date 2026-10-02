@@ -1,5 +1,5 @@
 // Loads the player's animation frames from plain PNG files in
-// frontend/assets/player/. Each file is named "<action>_<direction>.png",
+// assets/player/. Each file is named "<action>_<direction>.png",
 // e.g. "walk_NE.png" or "attack_S.png".
 //
 // TO EDIT THE ART: just open any of those PNG files in an image editor
