@@ -23,6 +23,7 @@
 <div>Level <span id="hud-level">1</span></div>
 <div>Wave <span id="hud-wave">1</span></div>
 <div>Kills: <span id="hud-kills">0</span></div>
+<div class="hud-gold">🪙 <span id="hud-gold">0</span></div>
 </div>
 </div>
 </div>
@@ -40,6 +41,7 @@
 <nav id="menu-column">
 <button class="btn menu-option" id="menu-start">START</button>
 <button class="btn menu-option" id="menu-highscores">HIGHSCORES</button>
+<button class="btn menu-option" id="menu-shop">SHRINE</button>
 <button class="btn menu-option" id="menu-options">OPTIONS</button>
 <button class="btn menu-option exit" id="menu-exit">EXIT</button>
 </nav>
@@ -66,6 +68,21 @@
 <div id="highscore-list"></div>
 <button class="btn pause-action" id="highscore-clear-btn">CLEAR SCORES</button>
 <button class="btn pause-action" id="highscore-back-btn">BACK</button>
+</div>
+
+<div id="shop-panel">
+<h2>THE SHRINE</h2>
+<div id="shop-balance"><span class="shop-coin">🪙</span><span id="shop-gold">0</span></div>
+<div id="shop-tabs">
+<button class="hs-tab shop-tab active" data-tab="powerups">POWER-UPS</button>
+<button class="hs-tab shop-tab" data-tab="relics">RELICS</button>
+</div>
+<div id="shop-hint">Gold drops from the slain. Power-ups add weapons and passives to your level-up pool; relics permanently sharpen your soul.</div>
+<div id="shop-list"></div>
+<div id="shop-actions">
+<button class="btn pause-action" id="shop-reset-btn">RESET</button>
+<button class="btn pause-action" id="shop-back-btn">BACK</button>
+</div>
 </div>
 
 <div id="diff-panel">
@@ -133,6 +150,8 @@ const DPR = () => devicePixelRatio || 1;
 
 <script src="src/config.js"></script>
 <script src="src/utils.js"></script>
+<script src="src/meta/shop.js"></script>
+<script src="src/meta/shopUI.js"></script>
 <script src="src/sprites/registry.js"></script>
 <script src="src/enemies/sprites/loader.js"></script>
 <script src="src/map/sprites.js"></script>
@@ -149,6 +168,7 @@ const DPR = () => devicePixelRatio || 1;
 <script src="src/Camera.js"></script>
 <script src="src/Particles.js"></script>
 <script src="src/items/Item.js"></script>
+<script src="src/items/Coin.js"></script>
 <script src="src/items/sprites.js"></script>
 <script src="src/projectiles/sprites/player.js"></script>
 <script src="src/projectiles/sprites/enemy.js"></script>
@@ -179,6 +199,7 @@ const DPR = () => devicePixelRatio || 1;
 <script src="src/render/renderOverlay.js"></script>
 <script src="src/render/obstacles.js"></script>
 <script src="src/render/xpOrbs.js"></script>
+<script src="src/render/coins.js"></script>
 <script src="src/render/items.js"></script>
 <script src="src/render/enemies.js"></script>
 <script src="src/render/projectiles.js"></script>

@@ -157,25 +157,87 @@ const CHARACTERS = [
 ];
 function findCharacter(id) { return CHARACTERS.find((c) => c.id === id) || CHARACTERS[0]; }
 
+// ---------------------------------------------------------------------------
+// SHOP — Vampire-Survivors-style permanent meta progression bought with gold.
+// Two kinds of purchase:
+//   POWER-UPS  one-off unlocks that add a weapon/passive to the level-up pool.
+//              Locked entries never appear as level-up choices.
+//   RELICS     repeatable permanent stat boosts, cost rising each level.
+// Anything with free:true is owned from the first run, so a new save is never
+// left with an empty level-up pool.
+// ---------------------------------------------------------------------------
+
+function shopEntry(id, cost, free) {
+  const def = findUpgrade(id);
+  return { id, cost, free: !!free, icon: def.icon, name: def.name, desc: def.desc, kind: def.kind };
+}
+
+const SHOP_POWERUPS = [
+  // Characters' starting weapons are always owned.
+  shopEntry('whip', 0, true),
+  shopEntry('soulArrow', 0, true),
+  shopEntry('axe', 0, true),
+  shopEntry('might', 0, true),
+  shopEntry('armor', 0, true),
+  shopEntry('vitality', 0, true),
+  shopEntry('swiftness', 0, true),
+  shopEntry('scythe', 50),
+  shopEntry('lifesteal', 70),
+  shopEntry('recovery', 70),
+  shopEntry('alacrity', 85),
+  shopEntry('garlic', 90),
+  shopEntry('reach', 95),
+  shopEntry('magnet', 110),
+  shopEntry('firewand', 120),
+  shopEntry('orbital', 165),
+  shopEntry('lightning', 210)
+];
+
+function relicEntry(id, name, icon, desc, maxLevel, baseCost, costStep, applyFn) {
+  return { id, name, icon, desc, maxLevel, baseCost, costStep, apply: applyFn };
+}
+
+const SHOP_RELICS = [
+  relicEntry('vigor', 'Empowered Vigor', '❤', '+15 maximum HP, healed on purchase.', 10, 60, 50,
+    (p) => { p.maxHp += 15; p.hp = Math.min(p.maxHp, p.hp + 15); }),
+  relicEntry('fury', 'Blood Fury', '🗡', '+6% damage dealt.', 10, 80, 70,
+    (p) => { p.damageMult *= 1.06; }),
+  relicEntry('haste', 'Windward', '🌪', '+4% movement speed.', 8, 70, 60,
+    (p) => { p.speedMult *= 1.04; }),
+  relicEntry('aegis', 'Bone Ward', '🛡', 'Incoming damage reduced by 4%.', 8, 85, 75,
+    (p) => { p.armorMult *= 0.96; }),
+  relicEntry('fortune', 'Gilded Touch', '🪙', '+12% pickup range and +10% gold found.', 6, 90, 80,
+    (p) => { p.magnetRange *= 1.12; }),
+  relicEntry('reflex', 'Cat Reflexes', '💨', 'Dash cooldown reduced by 6%.', 6, 75, 65,
+    (p) => { p.baseDashCooldown = Math.max(0.6, p.baseDashCooldown * 0.94); })
+];
+
+function findRelic(id) { return SHOP_RELICS.find((r) => r.id === id) || null; }
+function findShopPowerup(id) { return SHOP_POWERUPS.find((u) => u.id === id) || null; }
+
 const DIFFICULTIES = {
   dusk: {
     label: 'Dusk', desc: 'The darkness stirs slowly…',
     hpScale: 0.08, dmgScale: 0.05, spdScale: 0.04,
-    spawnBonus: -2, spawnIntervalMult: 1.3, xpMult: 0.8, baseStatMult: 0.85
+    spawnBonus: -2, spawnIntervalMult: 1.3, xpMult: 0.8, baseStatMult: 0.85,
+    goldChance: 0.07, goldMult: 1
   },
   midnight: {
     label: 'Midnight', desc: 'The balance of shadow.',
     hpScale: 0.12, dmgScale: 0.07, spdScale: 0.05,
-    spawnBonus: 0, spawnIntervalMult: 1.0, xpMult: 1.0, baseStatMult: 1.0
+    spawnBonus: 0, spawnIntervalMult: 1.0, xpMult: 1.0, baseStatMult: 1.0,
+    goldChance: 0.11, goldMult: 1.5
   },
   void: {
     label: 'Void', desc: 'The abyss hungers…',
     hpScale: 0.17, dmgScale: 0.10, spdScale: 0.07,
-    spawnBonus: 2, spawnIntervalMult: 0.8, xpMult: 1.3, baseStatMult: 1.15
+    spawnBonus: 2, spawnIntervalMult: 0.8, xpMult: 1.3, baseStatMult: 1.15,
+    goldChance: 0.16, goldMult: 2.2
   },
   oblivion: {
     label: 'Oblivion', desc: 'The end of all things.',
     hpScale: 0.24, dmgScale: 0.15, spdScale: 0.10,
-    spawnBonus: 5, spawnIntervalMult: 0.6, xpMult: 1.5, baseStatMult: 1.25
+    spawnBonus: 5, spawnIntervalMult: 0.6, xpMult: 1.5, baseStatMult: 1.25,
+    goldChance: 0.22, goldMult: 3.2
   }
 };

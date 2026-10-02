@@ -17,6 +17,8 @@ class Game {
     this.enemies = [];
     this.projectiles = [];
     this.xpOrbs = [];
+    this.coins = [];
+    this.runGold = 0;
     this.items = [];
     this.obstacles = [];
     this.obstacleChunkCache = new Map(); // endless world: per-chunk obstacle cache
@@ -55,6 +57,7 @@ class Game {
       levelLabel: byId('hud-level'),
       waveLabel: byId('hud-wave'),
       killsLabel: byId('hud-kills'),
+      goldLabel: byId('hud-gold'),
       waveAnnouncement: byId('wave-announce'),
       waveAnnouncementNumber: byId('wave-num'),
       waveAnnouncementText: document.querySelector('#wave-announce span'),
@@ -87,6 +90,7 @@ class Game {
     this.resetRunState();
     const character = findCharacter(this.characterId);
     this.player = new Player(character);
+    applyRelicsToPlayer(this.player);
     this.refreshActiveObstacles();
     this.hideAllOverlays();
     this.state = 'playing';
@@ -103,11 +107,13 @@ class Game {
 
     const pool = [];
     for (const def of WEAPONS) {
+      if (!isPowerupOwned(def.id)) continue;   // shrine-locked: never offered
       const level = player.weapons[def.id] || 0;
       if (level === 0 && weaponCount < G.maxWeapons) pool.push(def);
       else if (level > 0 && level < def.maxLevel) pool.push(def);
     }
     for (const def of PASSIVES) {
+      if (!isPowerupOwned(def.id)) continue;
       const level = player.passives[def.id] || 0;
       if (level === 0 && passiveCount < G.maxPassives) pool.push(def);
       else if (level > 0 && level < def.maxLevel) pool.push(def);
@@ -446,6 +452,7 @@ class Game {
     this.ui.levelLabel.textContent = this.level;
     this.ui.waveLabel.textContent = this.waveManager.wave;
     this.ui.killsLabel.textContent = this.kills;
+    if (this.ui.goldLabel) this.ui.goldLabel.textContent = this.runGold;
 
     // Survival timer, M:SS — the Vampire Survivors signature clock.
     const totalSeconds = Math.floor(this.gameTime);
@@ -496,6 +503,8 @@ class Game {
     if (optionsPanel) optionsPanel.classList.remove('show');
     const highscorePanel = document.getElementById('highscore-panel');
     if (highscorePanel) highscorePanel.classList.remove('show');
+    const shopPanel = document.getElementById('shop-panel');
+    if (shopPanel) shopPanel.classList.remove('show');
     document.getElementById('exit-note').textContent = '';
     this.setElementVisible(this.ui.startScreen, true);
   }
@@ -798,6 +807,14 @@ class Game {
       if (!enemy.alive && !enemy.despawned && enemy.hp <= 0) {
         this.kills++;
         this.xpOrbs.push(new XpOrb(enemy.x, enemy.y, enemy.xpValue));
+        // Gold: elites always pay out a stack, regular kills roll a chance that
+        // climbs with difficulty (see DIFFICULTIES.goldChance).
+        const goldMult = this.difficulty.goldMult;
+        if (enemy.elite) {
+          this.coins.push(new Coin(enemy.x, enemy.y, Math.round(rand(3, 6) * goldMult)));
+        } else if (Math.random() < this.difficulty.goldChance) {
+          this.coins.push(new Coin(enemy.x, enemy.y, Math.max(1, Math.round(goldMult))));
+        }
         // Elites always drop a treasure chest; regular kills roll the tables.
         if (enemy.elite) {
           this.items.push(new Item(enemy.x, enemy.y, 'chest'));
@@ -822,6 +839,20 @@ class Game {
       }
     }
     this.xpOrbs = this.xpOrbs.filter((orb) => orb.alive);
+
+    for (const coin of this.coins) {
+      if (!coin.alive) continue;
+      const pickedUp = coin.update(deltaTime, this.player);
+      if (pickedUp) {
+        // Banked immediately: dying never forfeits gold already collected.
+        const value = Math.max(1, Math.round(coin.value * goldMultiplier()));
+        this.runGold += value;
+        addGold(value);
+        this.floatingNumbers.push(new FloatingNumber(coin.x, coin.y - 14, '+' + value + ' gold', '#c9a84c', 14));
+        this.particles.emit(coin.x, coin.y, 4, { speed: 50, life: 0.25, color: '#c9a84c', size: 2 });
+      }
+    }
+    this.coins = this.coins.filter((coin) => coin.alive);
 
     for (const item of this.items) {
       if (!item.alive) continue;

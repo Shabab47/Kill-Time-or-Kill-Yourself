@@ -16,6 +16,7 @@ class Renderer {
     renderObstacles(ctx, game, ww, wh);
     renderAura(ctx, game);
     renderXpOrbs(ctx, game);
+    renderCoins(ctx, game);
     renderItems(ctx, game);
     renderEnemies(ctx, game);
     renderProjectiles(ctx, game);

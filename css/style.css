@@ -20,6 +20,8 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 #xp-fill{background:linear-gradient(90deg,#4a0000,#ff4444)}
 #hud-text{color:#7e7e7e;font-size:13px;text-shadow:0 1px 3px rgba(0,0,0,0.8);line-height:1.8;font-weight:400;letter-spacing:1px}
 #hud-text span{color:#c9a84c;font-weight:700}
+.hud-gold{color:#7e7e7e;font-size:13px;letter-spacing:1px;margin-top:2px}
+.hud-gold span{color:#c9a84c;font-weight:700;font-variant-numeric:tabular-nums}
 #wave-announce{position:absolute;top:45%;left:50%;transform:translate(-50%,-50%);font-size:48px;font-weight:900;color:#c62828;text-shadow:0 0 40px rgba(198,40,40,0.2),0 2px 10px rgba(0,0,0,0.8);pointer-events:none;opacity:0;transition:opacity 0.4s;letter-spacing:3px;text-align:center}
 #wave-announce.show{opacity:1}
 #wave-announce span{font-size:16px;font-weight:400;color:#9e9e9e;display:block;margin-top:8px;letter-spacing:2px}
@@ -49,6 +51,34 @@ canvas{display:block;width:100%;height:100%;image-rendering:pixelated}
 .hs-tab:hover{color:#c9a84c;border-color:rgba(201,168,76,0.5)}
 .hs-tab.active{color:#c9a84c;border-color:#c9a84c;background:rgba(201,168,76,0.12);box-shadow:0 0 12px rgba(201,168,76,0.2)}
 #gameover-actions{display:flex;flex-direction:column;gap:12px;align-items:center;width:min(260px,80vw)}
+
+/* --- Shrine (shop) --- */
+#shop-panel{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(rgba(5,5,5,0.93),rgba(5,5,5,0.93)),url('../assets/menu/KtoKys.png') center/cover no-repeat;z-index:11;gap:14px;padding:20px;border:1px solid rgba(201,168,76,0.15)}
+#shop-panel.show{display:flex}
+#shop-panel h2{font-size:44px;color:#c9a84c;text-shadow:0 0 30px rgba(201,168,76,0.3);letter-spacing:4px;margin:0}
+#shop-balance{display:flex;align-items:center;gap:10px;font-size:26px;color:#c9a84c;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:2px;background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);border-radius:6px;padding:6px 22px}
+#shop-balance .shop-coin{font-size:24px}
+#shop-tabs{display:flex;gap:8px;justify-content:center}
+#shop-hint{max-width:min(620px,90vw);text-align:center;color:#7e7e7e;font-size:12px;letter-spacing:0.5px;line-height:1.5;margin:-4px 0 0}
+#shop-list{display:flex;flex-direction:column;gap:6px;width:min(660px,92vw);max-height:52vh;overflow-y:auto;padding:6px}
+.shop-row{display:grid;grid-template-columns:40px 1fr auto;gap:14px;align-items:center;background:rgba(40,40,40,0.14);border:1px solid rgba(201,168,76,0.12);border-radius:4px;padding:9px 14px}
+.shop-row.affordable{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.07)}
+.shop-row.locked{opacity:0.5}
+.shop-row.owned{border-color:rgba(102,187,106,0.35);background:rgba(102,187,106,0.06)}
+.shop-icon{font-size:24px;text-align:center}
+.shop-text{display:flex;flex-direction:column;gap:3px;text-align:left;min-width:0}
+.shop-name{color:#d8d8d8;font-size:14px;font-weight:700;letter-spacing:1px}
+.shop-name em{color:#8a8a8a;font-style:normal;font-size:11px;letter-spacing:0.5px}
+.shop-desc{color:#7e7e7e;font-size:11px;line-height:1.45}
+.shop-pips{display:flex;gap:3px;margin-top:2px}
+.shop-pip{width:9px;height:4px;border-radius:2px;background:rgba(255,255,255,0.12)}
+.shop-pip.on{background:#c9a84c;box-shadow:0 0 6px rgba(201,168,76,0.5)}
+.shop-buy{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:78px;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.45);color:#c9a84c;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:1px;padding:7px 10px;border-radius:4px;cursor:pointer;transition:all .15s}
+.shop-buy:hover:not(:disabled){background:rgba(201,168,76,0.24);box-shadow:0 0 14px rgba(201,168,76,0.28);transform:translateY(-1px)}
+.shop-buy:disabled{opacity:0.32;cursor:not-allowed}
+.shop-cost{font-size:12px;font-variant-numeric:tabular-nums}
+.shop-owned-tag{color:#66bb6a;font-size:11px;font-weight:700;letter-spacing:1.5px;min-width:78px;text-align:center}
+#shop-actions{display:flex;gap:12px;align-items:center}
 #highscore-list{display:flex;flex-direction:column;gap:6px;width:min(460px,86vw);max-height:46vh;overflow-y:auto;padding:6px}
 .highscore-row{display:grid;grid-template-columns:36px 1fr 80px 72px 72px;gap:12px;align-items:center;background:rgba(40,40,40,0.12);border:1px solid rgba(201,168,76,0.12);border-radius:4px;padding:8px 14px;color:#c8c8c8;font-size:14px;letter-spacing:0.5px}
 .highscore-row .rank{color:#c9a84c;font-weight:700;font-size:16px}
