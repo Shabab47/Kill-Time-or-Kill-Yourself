@@ -9,12 +9,16 @@ function renderEnemies(ctx, game, dw, dh) {
       if (spriteEntry) {
         const sizeMult = e.animState === 'dead' ? 0.65 : 1;
         const targetH = e.size * 4.6 * sizeMult;
-        const scale = targetH / spriteEntry.h;
-        const drawW = spriteEntry.w * scale;
-        const drawH = targetH;
+        // One shared scale per enemy type (frames are individually cropped), and
+        // the opaque box is anchored bottom-centre so the skeleton neither
+        // pulses in size nor slides/bounces as the frames change.
+        const box = spriteEntry.box || { x: 0, y: 0, w: spriteEntry.w, h: spriteEntry.h };
+        const scale = getEnemySpriteScale('skeleton', targetH);
+        const drawW = box.w * scale;
+        const drawH = box.h * scale;
         const drawX = e.x - drawW / 2;
         const drawY = e.y + e.size * 0.9 - drawH;
-        ctx.drawImage(spriteEntry.img, drawX, drawY, drawW, drawH);
+        ctx.drawImage(spriteEntry.img, box.x, box.y, box.w, box.h, drawX, drawY, drawW, drawH);
       } else {
         ctx.drawImage(sprites[e.type], e.x - ss / 2, e.y - ss / 2, ss, ss);
       }
